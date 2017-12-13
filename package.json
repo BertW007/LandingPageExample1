@@ -1,7 +1,7 @@
 {
-  "name": "jquerysassextractwebpack",
+  "name": "fashiontheme",
   "version": "1.0.0",
-  "description": "JS Boilerplate with JQuery/Sass/Autoprefixer/ExtractTextPlugin/Babel/ES6/Webpack/Webpack-Dev-Server",
+  "description": "JS Fashion Theme",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
