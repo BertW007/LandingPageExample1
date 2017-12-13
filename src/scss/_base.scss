@@ -1,0 +1,30 @@
+@import "variables";
+@import "mixins";
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  line-height: 1.4em;
+  vertical-align: baseline;
+  text-decoration: none;
+  outline: 0;
+}
+
+body, html {
+  background-color: $background-color;
+  color: $font-color;
+  font-family: $font-type;
+}
+
+.list {
+  display: flex;
+  .wrapper {
+    margin: 0 auto;
+    padding: 50px 20px 50px 20px;
+    ul {
+      padding: 20px 5px 20px 20px;
+      list-style-type: square;
+    }
+  }
+}
