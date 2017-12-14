@@ -1,3 +1,51 @@
+@font-face {
+  font-family: 'Fjalla One';
+  src: url('../fonts/Fjalla_One/FjallaOne-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Encode Sans Condensed';
+  src: url('../fonts/Encode_Sans_Condensed/EncodeSansCondensed-Regular.ttf') format('truetype');
+}
+
+
+$paragraph-font: 'Encode Sans Condensed', sans-serif;
+$header-font: 'Fjalla One', sans-serif;
+$button-font: 'Fjalla One', sans-serif;
+
+$banner-image: '../img/fashion_girl.jpg';
+
 $background-color: rgba(34,34,34,1);
+$footer-background-color: rgba(34,34,34,1);
+$nav-background-color: rgba(34,34,34,1);
+$main-background-color: rgba(255,255,255,1);
+
 $font-color: rgba(255,255,255,1);
-$font-type: Arial, Sans-Serif;
+
+$links-color: rgba(222,222,222,1);
+$links-hov-color: rgba(100,100,100,1);
+$outline-color: rgba(255,90,90,1);
+
+$transparent-color: rgba(0,0,0,0);
+$header-boxshadow-color: rgba(0,0,0,.7);
+$header-button-border-color: rgba(255,255,255,.6);
+$header-button-icon-part-color: rgba(255,255,255,1);
+$header-text-color: rgba(255,255,255,1);
+$header-transparent-text-color: rgba(0,0,0,1);
+
+$nav-items-boxshadow-color: rgba(255,255,255,1);
+$nav-items-last-boxshadow: rgba(0,0,0,1);
+$nav-items-hov-color: rgba(255,255,255,1);
+$nav-items-text-color: rgba(34,34,34,1);
+$nav-items-text-hov-color: rgba(0,0,0,1);
+
+$article-font-color: rgba(34,34,34,1);
+
+$paragraph-font-size: 18px;
+$header1-font-size: 30px;
+$header2-font-size: 20px;
+$header3-font-size: 20px;
+$button-font-size: 20px;
+$footer-font-size: 18px;
+
+$header-height: 80px;
+$banner-height: 100vh;
