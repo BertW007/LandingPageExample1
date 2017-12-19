@@ -9,6 +9,7 @@
   vertical-align: baseline;
   text-decoration: none;
   outline: 0;
+  box-sizing: border-box;
 }
 
 body, html {
@@ -143,11 +144,11 @@ nav li:last-child .nav-item {
   font-family: $header-font;
   font-size: $header2-font-size;
   width: 100%;
-  padding: 15px 0px 15px 0px;
+  padding: 15px;
 }
 .footer-links {
   width: 100%;
-  padding: 15px 0px 15px 0px;
+  padding: 15px;
   ul {
     list-style: none;
   }
