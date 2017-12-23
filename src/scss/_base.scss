@@ -84,7 +84,6 @@ footer {
   font-size: $footer-font-size;
   display: flex;
   flex-direction: column;
-  align-items: center;
   background-color: $footer-background-color;
   text-transform: capitalize;
   padding: 20px;
@@ -99,6 +98,7 @@ footer {
   height: 50px;
   box-shadow: 0px .5px 1px $nav-items-boxshadow-color;
   margin-top: 2px;
+  transition: background-color .3s;
   &:hover {
     background-color: $background-color;
     color: $font-color;
@@ -133,24 +133,56 @@ nav li:last-child .nav-item {
 }
 .copyrights {
   display: flex;
-  justify-content: space-around;
+  padding: 30px;
   background-color: $footer-background-color;
   text-transform: capitalize;
+  margin-bottom: 20px;
 }
 .before-footer {
-  height: 100px;
+  height: 10px;
+  background: $background-color;
+  background: linear-gradient(0deg, rgba(34,34,34,1) 20%, rgba(0,0,0,1) 80%);
 }
 .footer-logo {
   font-family: $header-font;
   font-size: $header2-font-size;
   width: 100%;
   padding: 15px;
+  h3 {
+    margin-bottom: 10px;
+  }
+}
+.footer-logo-short {
+  font-size: 60px;
+  font-weight: bold;
+  display: block;
+  color: $background-color;
+}
+.footer-logo-short-content {
+  width: 90px;
+  height: 90px;
+  letter-spacing: 5px;
+  display: flex;
+  background-color: $footer-logo-background-color;
+  border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
 .footer-links {
   width: 100%;
   padding: 15px;
   ul {
     list-style: none;
+  }
+}
+.footer-link-withicon {
+  display: flex;
+  a {
+    margin: 4px;
+  }
+  img {
+    margin: 2px 5px 2px 0px;
   }
 }
 
@@ -177,6 +209,13 @@ nav li:last-child .nav-item {
       color: $nav-items-text-hov-color;
     }
   }
+
+  .copyrights {
+    justify-content: space-around;
+  }
+  .footer-links {
+    text-align: left;
+  }
   header {
     display: inline-block;
     color: $header-transparent-text-color;
@@ -202,6 +241,7 @@ nav li:last-child .nav-item {
   footer {
     flex-direction: row;
     align-items: flex-start;
+    justify-content: center;
     width: 80%;
     margin: 0 auto;
   }
