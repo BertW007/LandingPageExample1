@@ -42,12 +42,13 @@ a:link, a:visited, a:active {
   color: $links-color;
 }
 a:focus {
-  outline: 2px solid $outline-color
+  outline: 0;
 }
 a:hover {
   color: $links-hov-color;
 }
 nav {
+  display: none;
   ul {
     list-style: none;
   }
@@ -58,9 +59,6 @@ button {
   font-weight:lighter;
   cursor: pointer;
   text-transform: uppercase;
-  &:focus {
-    outline: 2px solid $outline-color;
-  }
 }
 header {
   color: $header-text-color;
@@ -88,10 +86,16 @@ footer {
   text-transform: capitalize;
   padding: 20px;
 }
+.outline {
+  &:focus {
+    outline: 2px solid $outline-color;
+  }
+}
 .header-nav-wrapper {
   position: fixed;
   width: 100%;
   background-color: $nav-background-color;
+  transition: background-color .3s;
 }
 .nav-item {
   width: 100%;
@@ -101,7 +105,7 @@ footer {
   transition: background-color .3s;
   &:hover {
     background-color: $background-color;
-    color: $font-color;
+    color: $nav-items-text-hov-color-sm;
     box-shadow: none;
   }
 }
@@ -115,15 +119,109 @@ nav li:last-child .nav-item {
   padding: 8px;
   flex-shrink: 0;
   margin: 20px;
+  transition: border-color 1s;
   .icon-part {
     display: block;
     margin: 5px auto;
     height: 3px;
     width: 30px;
     border: 0;
+    border-radius: 2px;
     background-color: $header-button-icon-part-color;
+    transition: background-color 1s;
   }
 }
+.nav-open {
+  border-color: $header-button-pressed-border-color;
+  .icon-part {
+    background-color: $header-button-pressed-icon-part-color;
+  }
+  animation: button_rotate_open .4s both ease-in;
+  .icon-part:nth-child(1) {
+    animation: button_part_open .4s both ease-in;
+  }
+  .icon-part:nth-child(3) {
+    animation: button_part2_open .4s both ease-in;
+  }
+}
+.nav-close {
+  animation: button_rotate_close .4s both ease-out;
+  .icon-part:nth-child(1) {
+    animation: button_part_close .4s both ease-in;
+  }
+  .icon-part:nth-child(3) {
+    animation: button_part2_close .4s both ease-in;
+  }
+}
+
+@keyframes button_rotate_open {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(180deg);
+  }
+}
+
+@keyframes button_rotate_close {
+  0% {
+    transform: rotateZ(180deg);
+  }
+  100% {
+    transform: rotateZ(0deg);
+  }
+}
+
+@keyframes button_part_open {
+  0% {}
+  50% {
+    transform: translateY(8px);
+  }
+  100% {
+    width: 20px;
+    transform: rotateZ(30deg) translateX(6px);
+  }
+}
+
+@keyframes button_part2_open {
+  0% {}
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    width: 20px;
+    transform: rotateZ(-30deg) translateX(6px);
+  }
+}
+
+@keyframes button_part_close {
+  0% {
+    width: 20px;
+    transform: rotateZ(30deg) translateY(5px) translateX(6px);
+  }
+  50% {
+    transform: translateY(0px);
+  }
+  100% {
+    width: 30px;
+    transform: rotateZ(0deg) translateX(0px);
+  }
+}
+
+@keyframes button_part2_close {
+  0% {
+    width: 20px;
+    transform: rotateZ(-30deg) translateY(-5px) translateX(6px);
+  }
+  50% {
+    transform: translateY(0px);
+  }
+  100% {
+    width: 30px;
+    transform: rotateZ(0deg) translateX(0px);
+  }
+}
+
 .banner {
   height: $banner-height;
   width: 100%;
@@ -141,7 +239,7 @@ nav li:last-child .nav-item {
 .before-footer {
   height: 10px;
   background: $background-color;
-  background: linear-gradient(0deg, rgba(34,34,34,1) 20%, rgba(0,0,0,1) 80%);
+  background: $before-footer-gradient;
 }
 .footer-logo {
   font-family: $header-font;
@@ -213,15 +311,27 @@ nav li:last-child .nav-item {
   .copyrights {
     justify-content: space-around;
   }
-  .footer-links {
-    text-align: left;
+
+  .scrolling {
+    background-color: $nav-background-color;
+    header {
+      color: $header-text-color;
+    }
+    .nav-item {
+      color: $nav-items-text-scrolling-color;
+      &:hover {
+        color: $nav-items-text-hov-scrolling-color;
+      }
+    }
   }
+
   header {
     display: inline-block;
     color: $header-transparent-text-color;
     box-shadow: none;
   }
   nav {
+    display: block !important;
     ul {
       li {
         display: inline-block;

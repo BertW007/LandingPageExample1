@@ -1,63 +1,63 @@
 import $ from "jquery";
 import '../scss/main.scss';
 
-function appInit(q,id) {
-  const domID = id||'app',
-        app = q(`#${domID}`),
-        listData = [
-          'JQuery',
-          'Sass/Autoprefixer',
-          'ExtractTextPlugin',
-          'Babel/ES6',
-          'Webpack',
-          'Webpack-Dev-Server'
-        ],
-        headerData = ':: JS Boilerplate ::';
-
-  const createList = (data) => {
-    const list = q('<div>'),
-          wrapper = q('<div>'),
-          ul = q('<ul>'),
-          header = q('<h1>');
-
-    list.addClass('list');
-    wrapper.addClass('wrapper');
-    header.text(headerData);
-    wrapper.append(header);
-
-    data.forEach((item) => {
-      let listItem = q('<li>');
-      listItem.text(item);
-      ul.append(listItem);
-    });
-
-    wrapper.append(ul);
-    list.append(wrapper);
-
-    return list;
-  }
-
-  const createHeader = (data) => {
-    const header = q('<h1>');
-    header.text(data);
-    return header;
-  }
-
-  const render = (args) => {
-    args.forEach((arg) => {
-      app.append(arg);
-    });
-  }
-
-  return {
-    renderView: () => {
-      const list = createList(listData);
-      render(
-        [list]
-      );
-    }
-  }
+function handleScrolling(id,position) {
+  const doc = document.documentElement;
+  const element = $('.' + id);
+  $(window).on('scroll',() => {
+    let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    top > position?
+    element.hasClass('scrolling')?
+      false: element.addClass('scrolling'):
+    element.removeClass('scrolling');
+  })
 }
 
-const App = appInit($);
-App.renderView();
+handleScrolling('header-nav-wrapper', 100);
+
+function handleButtonsOutline() {
+  const buttons = $('button');
+  const links = $('a');
+
+  $(window).on('keydown', (event) => {
+    const key = event.keyCode;
+    key === 9?
+    (buttons.addClass('outline'), links.addClass('outline')):
+    false;
+  });
+  $(window).on('click', (event) => {
+    buttons.hasClass('outline')?
+    (buttons.removeClass('outline'), links.removeClass('outline')):
+    false;
+  });
+}
+
+handleButtonsOutline();
+
+function handleNavSlideDown() {
+  const nav = $('nav');
+  const button = $('.toggle-nav');
+
+  button.on('click', () => {
+
+    button.attr('aria-pressed') === 'false'?
+    button.attr('aria-pressed','true'):
+    button.attr('aria-pressed','false');
+
+    if(button.hasClass('nav-open')) {
+      button.removeClass('nav-open');
+      button.addClass('nav-close');
+    } else {
+      button.addClass('nav-open');
+      button.removeClass('nav-close');
+    }
+
+    nav.attr('aria-expanded') === 'false'?
+    nav.attr('aria-expanded', 'true'):
+    nav.attr('aria-expanded', 'false');
+
+    nav.slideToggle('slow');
+  });
+}
+
+handleNavSlideDown();
