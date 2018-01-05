@@ -243,6 +243,9 @@ nav li:last-child .nav-item {
     &:hover {
       .gallery-item-info {
         opacity: 1;
+        h4 {
+          letter-spacing: normal;
+        }
       }
       img {
         filter: grayscale(100%);
@@ -265,7 +268,9 @@ nav li:last-child .nav-item {
         font-size: 10vh;
         text-transform: uppercase;
         color: rgba(255,255,255,1);
-        text-shadow: 0px .5px 1px rgba(34,34,34,1);;
+        text-shadow: 0px .5px 1px rgba(34,34,34,1);
+        transition: letter-spacing 1s;
+        letter-spacing: 15px;
       }
     }
     img {
@@ -359,12 +364,7 @@ nav li:last-child .nav-item {
     flex-direction: row;
     flex-wrap: wrap;
     li {
-      width: 25%;
-      .gallery-item-info {
-        h4 {
-          font-size: 5vh;
-        }
-      }
+      width: 50%;
     }
   }
 
