@@ -317,6 +317,44 @@ nav li:last-child .nav-item {
   }
 }
 
+.fetures-list {
+  display: flex;
+  list-style: none;
+  flex-direction: row;
+  flex-wrap: wrap;
+  li {
+    display: flex;
+    flex-direction: column;
+    margin: 50px auto;
+    width: 100%;
+    &:hover {
+      .fetures-list-item {
+
+      }
+    }
+    .fetures-list-item {
+      background-color: rgba(34,34,34,1);
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .fetures-list-info {
+      color: rgba(34,34,34,1);
+      width: 60%;
+      margin: 10px auto;
+      text-align: center;
+      h4 {
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+
 
 .copyrights {
   display: flex;
@@ -409,6 +447,23 @@ nav li:last-child .nav-item {
     flex-wrap: wrap;
     li {
       width: 50%;
+    }
+  }
+
+  .fetures-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    li {
+      width: 25%;
+      .fetures-list-item {
+        width: 100px;
+        height: 100px;
+      }
+      .fetures-list-info {
+        p,h4 {
+          font-size: 15px;
+        }
+      }
     }
   }
 
