@@ -86,6 +86,16 @@ footer {
   text-transform: capitalize;
   padding: 20px;
 }
+#markets {
+  padding-top: 60px;
+  padding-bottom: 60px;
+  // background-color: rgba(0,0,0,.4);
+  width: 100%;
+  h2,p {
+    text-align: center;
+  }
+
+}
 .outline {
   &:focus {
     outline: 2px solid $outline-color;
@@ -231,6 +241,32 @@ nav li:last-child .nav-item {
   background-size: cover;
 }
 
+.banner-short {
+  width: 100%;
+  min-height: 100px;
+  background-color: rgba(81,81,81,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  p {
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-size: 20px;
+    text-align: center;
+  }
+  button {
+    height: 50px;
+    width: 30%;
+    margin: 20px;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 10px;
+  }
+}
+
 .gallery-list {
   display: flex;
   flex-direction: column;
@@ -281,6 +317,7 @@ nav li:last-child .nav-item {
   }
 }
 
+
 .copyrights {
   display: flex;
   padding: 30px;
@@ -291,7 +328,6 @@ nav li:last-child .nav-item {
 .before-footer {
   height: 10px;
   background: $background-color;
-  background: $before-footer-gradient;
 }
 .footer-logo {
   font-family: $header-font;
@@ -338,6 +374,14 @@ nav li:last-child .nav-item {
 
 // MEDIA QUERIES
 @media (min-width: 768px) {
+  .banner-short {
+    flex-direction: row;
+    button {
+      height: 40%;
+      font-size: 18px;
+      width: 15%;
+    }
+  }
   .toggle-nav {
     display: none;
   }
@@ -414,5 +458,11 @@ nav li:last-child .nav-item {
     justify-content: center;
     width: 80%;
     margin: 0 auto;
+  }
+  #markets {
+    p,h4 {
+      width: 60%;
+      margin: 0 auto;
+    }
   }
 }
