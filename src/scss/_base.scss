@@ -87,12 +87,19 @@ footer {
   padding: 20px;
 }
 form {
+  padding-bottom: 20px;
   input, textarea {
     width: 100%;
     margin: 5px 0px 5px 0px;
+    padding: 10px;
+    border-radius: 5px;
   }
   .form-button {
     width: 40%;
+    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
   }
 }
 #map {
@@ -101,8 +108,6 @@ form {
 }
 #contact {
   padding: 0;
-  display: flex;
-  flex-direction: column-reverse;
 }
 #markets, #story, #about {
   padding-top: 60px;
@@ -129,12 +134,54 @@ form {
     padding-bottom: 50px;
   }
 }
+.banner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    text-shadow: 0px .5px 1px rgba(34,34,34,1);
+  }
+  h2 {
+   color: rgba(173,0,58,1);
+   font-size: 30px;
+  }
+  &> * {
+    width: 40%;
+    margin: 20px auto;
+    text-align: center;
+  }
+  button {
+    width: 200px;
+    border-radius: 5px;
+    font-size: 20px;
+    padding: 10px;
+    background-color: rgba(173,0,58,1);
+    color: rgba(255,255,255,1);
+  }
+}
 .flex-wrapper {
   display: flex;
 }
+.contact-header, .clients {
+  background-color: rgba(255,255,255,1);
+  padding: 10px;
+  p, h2 {
+    width: 60%;
+    margin: 20px auto;
+    text-align: center;
+    color: rgba(34,34,34,1);
+  }
+  p:last-child {
+    font-size: 14px;
+    color: rgba(0,0,0,.5);
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
 .form-wrapper {
   width: 100%;
-  background-color: rgba(34,34,34,1);
+  background-color: rgba(0,0,0,1);
   padding: 20px;
   color: rgba(255,255,255,1);
   ul {
@@ -147,6 +194,10 @@ form {
       }
     }
   }
+}
+.map-form-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
 .banner-right {
@@ -469,15 +520,25 @@ nav li:last-child .nav-item {
     .fetures-list-info {
       color: rgba(34,34,34,1);
       width: 60%;
-      margin: 10px auto;
+      margin: 30px auto;
       text-align: center;
       h4 {
         text-transform: uppercase;
+        margin-bottom: 5px;
       }
     }
   }
 }
-
+.sponsors {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+  background-color: rgba(255,255,255,.8);
+  overflow: hidden;
+}
 .copyrights {
   display: flex;
   padding: 30px;
@@ -576,7 +637,6 @@ nav li:last-child .nav-item {
       width: 50%;
     }
   }
-
   .fetures-list {
     flex-direction: row;
     flex-wrap: wrap;
@@ -593,7 +653,6 @@ nav li:last-child .nav-item {
       }
     }
   }
-
   .copyrights {
     justify-content: space-around;
   }
@@ -668,7 +727,7 @@ nav li:last-child .nav-item {
       margin: 0 auto;
     }
   }
-  #contact {
+  .map-form-wrapper {
     flex-direction: row;
   }
   #map {

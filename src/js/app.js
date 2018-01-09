@@ -8,7 +8,7 @@ function initMap() {
   GoogleMapsLoader.load(function(google) {
     const locations = [
       ['Warsaw', 52.286983, 21.062947, 'Lorem ipsum dolor sit amet'],
-      ['Frankfurt', 49.679659, 5.770013, 'Lorem ipsum dolor sit amet'],
+      ['London', 51.514636, -0.179911, 'Lorem ipsum dolor sit amet'],
       ['Rome', 41.840964, 12.520881, 'Lorem ipsum dolor sit amet'],
     ];
     const position = new google.maps.LatLng(52.286983, 21.062947);
@@ -58,7 +58,7 @@ function initMap() {
           "elementType": "geometry",
           "stylers": [
             {
-              "color": "#757575"
+              visibility: "off"
             }
           ]
         },
