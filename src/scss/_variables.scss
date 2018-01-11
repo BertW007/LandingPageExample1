@@ -12,16 +12,20 @@ $paragraph-font: 'Encode Sans Condensed', sans-serif;
 $header-font: 'Fjalla One', sans-serif;
 $button-font: 'Fjalla One', sans-serif;
 
-$banner-image: '../img/fashion_girl.jpg';
+$banner-image_1: '../img/banner_1.jpg';
+$banner-image_2: '../img/banner_2.jpg';
+$banner-image_3: '../img/banner_3.jpg';
 $banner-bg-image_1: '../img/cloth_bg_3.jpg';
 $banner-bg-image_2: '../img/cloth_bg_1.jpg';
+$banner-next-button: '../img/next.svg';
+$banner-prev-button: '../img/prev.svg';
 
 $background-color: rgba(34,34,34,1);
 $footer-background-color: rgba(34,34,34,1);
 $nav-background-color: rgba(34,34,34,1);
 $main-background-color: rgba(255,255,255,1);
 
-$font-color: rgba(255,255,255,1);
+$font-color: rgba(34,34,34,1);
 
 $links-color: rgba(222,222,222,1);
 $links-hov-color: rgba(255,163,194,1);
@@ -53,6 +57,8 @@ $paragraph-font-size: 18px;
 $header1-font-size: 30px;
 $header2-font-size: 20px;
 $header3-font-size: 20px;
+$header4-font-size: 20px;
+$header5-font-size: 20px;
 $button-font-size: 20px;
 $footer-font-size: 18px;
 

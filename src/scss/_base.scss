@@ -16,8 +16,9 @@ body, html {
   background-color: $background-color;
   color: $font-color;
   font-family: $paragraph-font;
+  -webkit-font-smoothing: antialiased;
 }
-h1,h2,h3 {
+h1,h2,h3,h4,h5 {
   font-family: $header-font;
   text-transform: uppercase;
 }
@@ -31,6 +32,14 @@ h2 {
 }
 h3 {
   font-size: $header3-font-size;
+  font-weight: normal;
+}
+h4 {
+  font-size: $header4-font-size;
+  font-weight: normal;
+}
+h5 {
+  font-size: $header5-font-size;
   font-weight: normal;
 }
 p {
@@ -47,18 +56,23 @@ a:focus {
 a:hover {
   color: $links-hov-color;
 }
+ul {
+  list-style: none;
+}
 nav {
   display: none;
-  ul {
-    list-style: none;
-  }
 }
-button {
+button, input[type="submit"] {
   font-family: $button-font;
   font-size: $button-font-size;
-  font-weight:lighter;
+  font-weight: lighter;
   cursor: pointer;
   text-transform: uppercase;
+  background-color: rgba(173,0,58,1);
+  color: rgba(255,255,255,1);
+  box-shadow: 0px .5px 1px  rgba(0,0,0,.7);
+  padding: 10px;
+  border-radius: 5px;
 }
 header {
   color: $header-text-color;
@@ -73,10 +87,6 @@ header {
 }
 main {
   background-color: $main-background-color;
-}
-article {
-  padding: 20px;
-  color: $article-font-color;
 }
 footer {
   font-size: $footer-font-size;
@@ -94,21 +104,13 @@ form {
     padding: 10px;
     border-radius: 5px;
   }
-  .form-button {
-    width: 40%;
-    text-transform: uppercase;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-  }
 }
+
 #map {
   height: 500px;
   width: 100%;
 }
-#contact {
-  padding: 0;
-}
+
 #markets, #story, #about {
   padding-top: 60px;
   padding-bottom: 60px;
@@ -121,6 +123,7 @@ form {
   color: rgba(255,255,255,1);
   width: 75%;
 }
+
 #about {
   padding: 0;
   background-color: rgba(0,0,0,.1);
@@ -134,32 +137,86 @@ form {
     padding-bottom: 50px;
   }
 }
-.banner {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  p {
-    text-shadow: 0px .5px 1px rgba(34,34,34,1);
-  }
-  h2 {
-   color: rgba(173,0,58,1);
-   font-size: 30px;
-  }
-  &> * {
-    width: 40%;
-    margin: 20px auto;
-    text-align: center;
-  }
-  button {
-    width: 200px;
-    border-radius: 5px;
-    font-size: 20px;
-    padding: 10px;
-    background-color: rgba(173,0,58,1);
-    color: rgba(255,255,255,1);
+
+.outline {
+  &:focus {
+    outline: 2px solid $outline-color;
   }
 }
+
+// MAIN BANNER
+
+.banner {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  height: $banner-height;
+  width: 100%;
+  .banner-content[data-id="1"] {
+    background-image: url($banner-image_1);
+    transform: translateX(0);
+  }
+  .banner-content[data-id="2"] {
+    background-image: url($banner-image_2);
+    transform: translateX(100%);
+  }
+  .banner-content[data-id="3"] {
+    background-image: url($banner-image_3);
+    transform: translateX(100%);
+  }
+  .banner-content {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-position: center;
+    background-size: cover;
+    p {
+      text-shadow: 0px .5px 1px rgba(34,34,34,1);
+      color: rgba(255,255,255,1);
+      font-size: 15px;
+    }
+    h2 {
+     color: rgba(173,0,58,1);
+     font-size: 20px;
+    }
+    &> * {
+      width: 40%;
+      margin: 20px auto;
+      text-align: center;
+    }
+    button {
+      width: 200px;
+    }
+  }
+  .banner-controls-left,.banner-controls-right {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    background-position: center;
+    background-size: cover;
+    transform-origin: 50% 50%;
+    transition: transform .5s;
+    z-index: 88;
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+  .banner-controls-left {
+    background-image: url($banner-prev-button);
+    left: 5%;
+  }
+  .banner-controls-right {
+    background-image: url($banner-next-button);
+    right: 5%;
+  }
+}
+
 .flex-wrapper {
   display: flex;
 }
@@ -271,11 +328,7 @@ form {
     margin: 0 10px;
   }
 }
-.outline {
-  &:focus {
-    outline: 2px solid $outline-color;
-  }
-}
+
 .header-nav-wrapper {
   position: fixed;
   width: 100%;
@@ -288,7 +341,9 @@ form {
   height: 50px;
   box-shadow: 0px .5px 1px $nav-items-boxshadow-color;
   margin-top: 2px;
+  background-color: rgba(255,255,255,.2);
   transition: background-color .3s;
+  border-radius: 0;
   &:hover {
     background-color: $background-color;
     color: $nav-items-text-hov-color-sm;
@@ -408,13 +463,7 @@ nav li:last-child .nav-item {
   }
 }
 
-.banner {
-  height: $banner-height;
-  width: 100%;
-  background-image: url($banner-image);
-  background-position: center;
-  background-size: cover;
-}
+
 
 .banner-short {
   width: 100%;

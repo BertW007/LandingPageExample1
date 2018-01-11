@@ -1,7 +1,11 @@
 import $ from 'jquery';
 import '../scss/main.scss';
 import GoogleMapsLoader from 'google-maps';
+import velocity from 'velocity-animate';
 import marker_icon from '../img/loc.svg';
+import banner_1 from '../img/banner_1.jpg';
+import banner_2 from '../img/banner_2.jpg';
+import banner_3 from '../img/banner_3.jpg';
 
 function initMap() {
   GoogleMapsLoader.LANGUAGE = 'en';
@@ -306,3 +310,88 @@ function handleNavSlideDown() {
 }
 
 handleNavSlideDown();
+
+const handleBannerActions = () => {
+
+  const banners = [
+    { img: banner_1,
+      query: $('.banner-content[data-id="1"]')
+    },
+    { img: banner_2,
+      query: $('.banner-content[data-id="2"]')
+    },
+    { img: banner_3,
+      query: $('.banner-content[data-id="3"]')
+    },
+  ];
+
+  const controls = {
+    left: $('.banner-controls-left'),
+    right: $('.banner-controls-right')
+  }
+
+  const animBanner = (d,b) => {
+    const current = $.map(b, (obj, index) => {
+        if(obj.query.hasClass('current')) {
+        return index;
+      }
+    })[0];
+    let cr = b[current],nx;
+    d===0?
+      nx = b[current+1]:
+      nx = b[current-1];
+    const t = [[['-100%'],['0%','100%']],[['100%','0%'],['0%']]];
+    nx
+    && !nx.query.hasClass('velocity-animating')
+    && !cr.query.hasClass('velocity-animating')? (
+    cr.query.velocity({translateX: t[d][0]},{duration: 1000, complete: () => {
+        cr.query.removeClass('current');
+      }}),
+        nx.query.velocity({translateX: t[d][1]},{duration: 1000, complete: () => {
+        nx.query.addClass('current');
+      }})
+    ): false;
+  }
+  let dr = 0;
+  const handleBannerRotation = (b) => {
+    const id = setTimeout(()=>{
+      const cr = $.map(b, (obj, index) => {
+          if(obj.query.hasClass('current')) {
+          return index;
+        }
+      })[0];
+      const nx = b[cr+1];
+      const pr = b[cr-1];
+      nx && !pr ? dr = 0:false;
+      pr && !nx ? dr = 1:false;
+      animBanner(dr,b);
+      clearTimeout(id);
+      handleBannerRotation(b);
+    }, 5000);
+  }
+  handleBannerRotation(banners);
+
+  const handleControls = (c,b) => {
+    c.left.on('click',() => {
+      animBanner(0,b);
+    });
+    c.right.on('click',() => {
+      animBanner(1,b);
+    });
+  }
+
+  const handleImagesLoad = (banner) => {
+    const bnr = $('<img/>').attr('src', banner.img);
+    bnr.on('load', function() {
+     $(this).remove(); // prevent memory leaks
+     banner.query.css('display','flex');
+    });
+  }
+
+  banners.forEach((banner) => {
+    handleImagesLoad(banner);
+  });
+
+  handleControls(controls,banners);
+}
+handleBannerActions();
