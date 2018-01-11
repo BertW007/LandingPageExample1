@@ -7,6 +7,7 @@ import banner_1 from '../img/banner_1.jpg';
 import banner_2 from '../img/banner_2.jpg';
 import banner_3 from '../img/banner_3.jpg';
 
+//GOOGLE MAPS
 function initMap() {
   GoogleMapsLoader.LANGUAGE = 'en';
   GoogleMapsLoader.load(function(google) {
@@ -248,8 +249,7 @@ function initMap() {
   });
 }
 
-initMap();
-
+//WINDOW SCROLLING
 function handleScrolling(id,position) {
   const doc = document.documentElement;
   const element = $('.' + id);
@@ -262,8 +262,7 @@ function handleScrolling(id,position) {
   })
 }
 
-handleScrolling('header-nav-wrapper', 100);
-
+//BUTTONS OUTLINE
 function handleButtonsOutline() {
   const buttons = $('button');
   const links = $('a');
@@ -281,8 +280,7 @@ function handleButtonsOutline() {
   });
 }
 
-handleButtonsOutline();
-
+//NAVIGATION
 function handleNavSlideDown() {
   const nav = $('nav');
   const button = $('.toggle-nav');
@@ -309,10 +307,8 @@ function handleNavSlideDown() {
   });
 }
 
-handleNavSlideDown();
-
+//BANNER
 const handleBannerActions = () => {
-
   const banners = [
     { img: banner_1,
       query: $('.banner-content[data-id="1"]')
@@ -347,8 +343,15 @@ const handleBannerActions = () => {
     cr.query.velocity({translateX: t[d][0]},{duration: 1000, complete: () => {
         cr.query.removeClass('current');
       }}),
-        nx.query.velocity({translateX: t[d][1]},{duration: 1000, complete: () => {
+        nx.query.velocity({translateX: t[d][1]},{duration: 1000, begin: ()=>{
+          nx.query.find('>*').velocity({opacity:0, translateY: '-50px'},{duration:0});
+        }, complete: () => {
         nx.query.addClass('current');
+        nx.query.find('h2').velocity('reverse',{duration:500,complete:()=>{
+          nx.query.find('p').velocity('reverse', {duration: 500, complete: ()=>{
+            nx.query.find('button').velocity('reverse', {duration: 500});
+          }});
+        }});
       }})
     ): false;
   }
@@ -373,10 +376,10 @@ const handleBannerActions = () => {
 
   const handleControls = (c,b) => {
     c.left.on('click',() => {
-      animBanner(0,b);
+      animBanner(1,b);
     });
     c.right.on('click',() => {
-      animBanner(1,b);
+      animBanner(0,b);
     });
   }
 
@@ -391,7 +394,11 @@ const handleBannerActions = () => {
   banners.forEach((banner) => {
     handleImagesLoad(banner);
   });
-
   handleControls(controls,banners);
 }
+
+initMap();
+handleScrolling('header-nav-wrapper', 100);
+handleButtonsOutline();
+handleNavSlideDown();
 handleBannerActions();
