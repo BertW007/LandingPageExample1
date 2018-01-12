@@ -651,9 +651,6 @@ nav li:last-child .nav-item {
   .icon-part {
     background-color: rgba(255,255,255,1);
   }
-  .nav-item {
-    color: $nav-items-text-scrolling-color;
-  }
 }
 .outline {
   &:focus {
@@ -663,6 +660,11 @@ nav li:last-child .nav-item {
 
 // MEDIA QUERIES
 @media (min-width: 768px) {
+  .scrolling {
+    .nav-item {
+      color: $nav-items-text-scrolling-color;
+    }
+  }
   .banner {
     .banner-content {
       h2 {
