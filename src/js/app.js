@@ -30,6 +30,42 @@ function initMap() {
         [51.514636, -0.179911, '<h5>England</h5>'],
         [41.840964, 12.520881, '<h5>Italy</h5>'],
       ];
+      const addresses = locations.map((location)=>{
+        return new Promise((resolve,reject)=>{
+          const loc =  new google.maps.LatLng(location[0], location[1]);
+            geocoder.geocode({location: loc}, (results, status)=>{
+              if (status === 'OK') {
+                resolve(results[0].formatted_address);
+              }else if (status === 'ZERO_RESULTS') {
+                reject('load faild@!');
+              }
+            })
+        })
+      });
+
+      Promise.all(addresses).then((items)=>{
+        map.fitBounds(bounds);
+        for (let i = 0; i < locations.length; i++) {
+          const infowindow = new google.maps.InfoWindow({
+              content: locations[i][2]+'<p>'+items[i]+'</p>',
+              pixelOffset: new google.maps.Size(0,17)
+          });
+          const marker = new google.maps.Marker({
+            position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+            animation: google.maps.Animation.DROP,
+            map: map,
+            icon: icon
+          });
+          google.maps.InfoWindow.prototype.opened = false;
+          marker.addListener('click',() => {
+            google.maps.InfoWindow.prototype.opened === false?
+            (infowindow.open(map, marker),
+              google.maps.InfoWindow.prototype.opened = true
+            ):
+            (google.maps.InfoWindow.prototype.opened = false, infowindow.close(map, marker))
+          })
+        };
+      })
 
       const map = new google.maps.Map(document.getElementById('map'), {
         center: center,
@@ -241,27 +277,7 @@ function initMap() {
           }
         ]
       });
-      map.fitBounds(bounds);
-      for (let i = 0; i < locations.length; i++) {
-        const infowindow = new google.maps.InfoWindow({
-            content: locations[i][2],
-            pixelOffset: new google.maps.Size(0,17)
-        });
-        const marker = new google.maps.Marker({
-          position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-          animation: google.maps.Animation.DROP,
-          map: map,
-          icon: icon
-        });
-        google.maps.InfoWindow.prototype.opened = false;
-        marker.addListener('click',() => {
-          google.maps.InfoWindow.prototype.opened === false?
-          (infowindow.open(map, marker),
-            google.maps.InfoWindow.prototype.opened = true
-          ):
-          (google.maps.InfoWindow.prototype.opened = false, infowindow.close(map, marker))
-        })
-      };
+
     const resize = () => {
       google.maps.event.trigger(map, "resize");
       map.fitBounds(bounds);
@@ -453,9 +469,3 @@ const mainLoader = () => {
 }
 
 mainLoader();
-// const init = () => {
-//   $(()=>{
-//
-//   });
-// }
-// init();
