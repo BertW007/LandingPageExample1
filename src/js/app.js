@@ -2,6 +2,7 @@ import $ from 'jquery';
 import '../scss/main.scss';
 import GoogleMapsLoader from 'google-maps';
 import velocity from 'velocity-animate';
+import Events from './events';
 import marker_icon from '../img/loc.svg';
 import banner_1 from '../img/banner_1.jpg';
 import banner_2 from '../img/banner_2.jpg';
@@ -9,59 +10,11 @@ import banner_3 from '../img/banner_3.jpg';
 import banner_bg_image_1 from '../img/cloth_bg_1.jpg';
 import banner_bg_image_2 from '../img/cloth_bg_3.jpg';
 
-
-
-// SMOOTH SCROLLING
-Math.easeOutQuad = function (t, b, c, d) { t /= d; return -c * t*(t-2) + b; };
-
-const handleSmoothMouseWheel = () => {
-  let upwards = true;
-  let end = null;
-  let intervalId = null;
-
-  const smoothMouseWheel = (event) => {
-    let delta = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
-    handler(delta);
-    event.preventDefault? event.preventDefault():false;
-    event.returnValue = false;
-  }
-
-  const handler = (delta) => {
-  	const animationInterval = 20;
-    const scrollSpeed = 15;
-    end == null? end = $(window).scrollTop(): false;
-    end -= 60 * delta;
-    upwards = delta > 0;
-    intervalId == null ?
-      intervalId = setInterval(() => {
-        const scrollTop = $(window).scrollTop();
-        const change = end - scrollTop;
-        const step = Math.easeOutQuad(0.5,0,change,scrollSpeed);
-        scrollTop <= 0 ||
-        scrollTop >= document.body.offsetHeight - $(window).height() ||
-        upwards && step > -1 ||
-        !upwards && step < 1 ?
-        (
-          clearInterval(intervalId),
-          intervalId = null,
-          end = null
-        ):
-        false;
-        $(window).scrollTop(scrollTop + step);
-      }, animationInterval):
-      false;
-  }
-  window.addEventListener? window.addEventListener('DOMMouseScroll', smoothMouseWheel, false):false;
-  window.onmousewheel = document.onmousewheel = smoothMouseWheel;
-}
-
-handleSmoothMouseWheel();
-
-
 //GOOGLE MAPS
 function initMap() {
   GoogleMapsLoader.LANGUAGE = 'en';
   GoogleMapsLoader.load(function(google) {
+      const geocoder = new google.maps.Geocoder;
       const icon = {
         url: marker_icon,
         scaledSize: new google.maps.Size(70,70),
@@ -69,21 +22,19 @@ function initMap() {
       const bounds = new google.maps.LatLngBounds();
       const firstB = new google.maps.LatLng(37.739333, 49.175194);
       const secondB = new google.maps.LatLng(58.730505, -13.269574);
+      const center = new google.maps.LatLng(52.286983, 21.062947);
       bounds.extend(firstB);
       bounds.extend(secondB);
       const locations = [
-        ['Warsaw', 52.286983, 21.062947, 'Lorem ipsum dolor sit amet'],
-        ['London', 51.514636, -0.179911, 'Lorem ipsum dolor sit amet'],
-        ['Rome', 41.840964, 12.520881, 'Lorem ipsum dolor sit amet'],
+        [52.286983, 21.062947, '<h5>Poland</h5>'],
+        [51.514636, -0.179911, '<h5>England</h5>'],
+        [41.840964, 12.520881, '<h5>Italy</h5>'],
       ];
-      const position = new google.maps.LatLng(52.286983, 21.062947);
 
       const map = new google.maps.Map(document.getElementById('map'), {
-        center: position,
+        center: center,
         zoom: 4,
         scrollwheel: false,
-        // zoomControl: true,
-        // gestureHandling: 'greedy',
         disableDefaultUI: true,
         styles: [
           {
@@ -293,30 +244,37 @@ function initMap() {
       map.fitBounds(bounds);
       for (let i = 0; i < locations.length; i++) {
         const infowindow = new google.maps.InfoWindow({
-            content: locations[i][3],
+            content: locations[i][2],
             pixelOffset: new google.maps.Size(0,17)
         });
         const marker = new google.maps.Marker({
-        position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-        animation: google.maps.Animation.DROP,
-        map: map,
-        icon: icon
-      });
-      google.maps.InfoWindow.prototype.opened = false;
-      marker.addListener('click',() => {
-        google.maps.InfoWindow.prototype.opened === false?
-        (infowindow.open(map, marker),
-          google.maps.InfoWindow.prototype.opened = true
-        ):
-        (google.maps.InfoWindow.prototype.opened = false, infowindow.close(map, marker))
-      })
-    };
-    google.maps.event.addDomListener(window, "resize", function() {
+          position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+          animation: google.maps.Animation.DROP,
+          map: map,
+          icon: icon
+        });
+        google.maps.InfoWindow.prototype.opened = false;
+        marker.addListener('click',() => {
+          google.maps.InfoWindow.prototype.opened === false?
+          (infowindow.open(map, marker),
+            google.maps.InfoWindow.prototype.opened = true
+          ):
+          (google.maps.InfoWindow.prototype.opened = false, infowindow.close(map, marker))
+        })
+      };
+    const resize = () => {
       google.maps.event.trigger(map, "resize");
       map.fitBounds(bounds);
+      map.setCenter(center);
+    }
+    google.maps.event.addDomListener(window, "resize", resize);
+    google.maps.event.addDomListener(window, "load", ()=>{
+      map.setCenter(center);
     });
   });
 }
+
+
 
 //WINDOW SCROLLING
 function handleScrolling(id,position) {
@@ -379,15 +337,9 @@ function handleNavSlideDown() {
 //BANNER
 const handleBannerActions = () => {
   const banners = [
-    { img: banner_1,
-      query: $('.banner-content[data-id="0"]')
-    },
-    { img: banner_2,
-      query: $('.banner-content[data-id="1"]')
-    },
-    { img: banner_3,
-      query: $('.banner-content[data-id="2"]')
-    },
+    { query: $('.banner-content[data-id="0"]')},
+    { query: $('.banner-content[data-id="1"]')},
+    { query: $('.banner-content[data-id="2"]')},
   ];
 
   const controls = {
@@ -461,8 +413,6 @@ const handleEmailAddress = () => {
 }
 
 const handleLoadImages = () => {
-  const content = $('.container');
-  const loader = $('#loader');
   const images = [
     banner_1,
     banner_2,
@@ -483,18 +433,29 @@ const handleLoadImages = () => {
       };
     });
   });
+  return imgsLoaded;
+}
 
-  Promise.all(imgsLoaded).then((images)=>{
+const mainLoader = () => {
+  const container = $('.container');
+  const loader = $('#loader');
+  const content = handleLoadImages();
+  Promise.all(content).then((items)=>{
     loader.velocity('fadeOut',{duration:1000});
-    content.velocity('fadeIn',{duration:1000});
+    container.velocity('fadeIn',{duration:1000});
+    handleBannerActions();
+    handleEmailAddress();
+    handleScrolling('header-nav-wrapper', 50);
+    handleButtonsOutline();
+    handleNavSlideDown();
+    initMap();
   });
 }
 
-handleLoadImages();
-
-handleEmailAddress();
-initMap();
-handleScrolling('header-nav-wrapper', 50);
-handleButtonsOutline();
-handleNavSlideDown();
-handleBannerActions();
+mainLoader();
+// const init = () => {
+//   $(()=>{
+//
+//   });
+// }
+// init();
