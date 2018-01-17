@@ -6,6 +6,57 @@ import marker_icon from '../img/loc.svg';
 import banner_1 from '../img/banner_1.jpg';
 import banner_2 from '../img/banner_2.jpg';
 import banner_3 from '../img/banner_3.jpg';
+import banner_bg_image_1 from '../img/cloth_bg_1.jpg';
+import banner_bg_image_2 from '../img/cloth_bg_3.jpg';
+
+
+
+// SMOOTH SCROLLING
+Math.easeOutQuad = function (t, b, c, d) { t /= d; return -c * t*(t-2) + b; };
+
+const handleSmoothMouseWheel = () => {
+  let upwards = true;
+  let end = null;
+  let intervalId = null;
+
+  const smoothMouseWheel = (event) => {
+    let delta = Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
+    handler(delta);
+    event.preventDefault? event.preventDefault():false;
+    event.returnValue = false;
+  }
+
+  const handler = (delta) => {
+  	const animationInterval = 20;
+    const scrollSpeed = 15;
+    end == null? end = $(window).scrollTop(): false;
+    end -= 60 * delta;
+    upwards = delta > 0;
+    intervalId == null ?
+      intervalId = setInterval(() => {
+        const scrollTop = $(window).scrollTop();
+        const change = end - scrollTop;
+        const step = Math.easeOutQuad(0.5,0,change,scrollSpeed);
+        scrollTop <= 0 ||
+        scrollTop >= document.body.offsetHeight - $(window).height() ||
+        upwards && step > -1 ||
+        !upwards && step < 1 ?
+        (
+          clearInterval(intervalId),
+          intervalId = null,
+          end = null
+        ):
+        false;
+        $(window).scrollTop(scrollTop + step);
+      }, animationInterval):
+      false;
+  }
+  window.addEventListener? window.addEventListener('DOMMouseScroll', smoothMouseWheel, false):false;
+  window.onmousewheel = document.onmousewheel = smoothMouseWheel;
+}
+
+handleSmoothMouseWheel();
+
 
 //GOOGLE MAPS
 function initMap() {
@@ -329,13 +380,13 @@ function handleNavSlideDown() {
 const handleBannerActions = () => {
   const banners = [
     { img: banner_1,
-      query: $('.banner-content[data-id="1"]')
+      query: $('.banner-content[data-id="0"]')
     },
     { img: banner_2,
-      query: $('.banner-content[data-id="2"]')
+      query: $('.banner-content[data-id="1"]')
     },
     { img: banner_3,
-      query: $('.banner-content[data-id="3"]')
+      query: $('.banner-content[data-id="2"]')
     },
   ];
 
@@ -343,7 +394,7 @@ const handleBannerActions = () => {
     left: $('.banner-controls-left'),
     right: $('.banner-controls-right')
   }
-
+// d - direction, b - banners
   const animBanner = (d,b) => {
     const current = $.map(b, (obj, index) => {
         if(obj.query.hasClass('current')) {
@@ -358,10 +409,10 @@ const handleBannerActions = () => {
     nx
     && !nx.query.hasClass('velocity-animating')
     && !cr.query.hasClass('velocity-animating')? (
-    cr.query.velocity({translateX: t[d][0]},{duration: 1500, complete: () => {
+    cr.query.velocity({translateX: t[d][0]},{easing: 'easeOutSine',duration: 1000, complete: () => {
         cr.query.removeClass('current');
       }}),
-    nx.query.velocity({translateX: t[d][1]},{duration: 1500, begin: () => {
+    nx.query.velocity({translateX: t[d][1]},{easing: 'easeOutSine',duration: 1000, begin: () => {
       nx.query.find('>*').velocity({opacity:0, translateY: '-50px'},{duration:0})}, complete: () => {
         nx.query.addClass('current');
         nx.query.find('h2').velocity('reverse',{duration:500, complete:() => {
@@ -390,8 +441,6 @@ const handleBannerActions = () => {
     }, 5000);
   }
 
-  handleBannerRotation(banners);
-
   const handleControls = (c,b) => {
     c.left.on('click',() => {
       animBanner(1,b);
@@ -401,17 +450,8 @@ const handleBannerActions = () => {
     });
   }
 
-  const handleImagesLoad = (banner) => {
-    const bnr = $('<img/>').attr('src', banner.img);
-    bnr.on('load', function() {
-     $(this).remove(); // prevent memory leaks
-     banner.query.css('display','flex');
-    });
-  }
-  banners.forEach((banner) => {
-    handleImagesLoad(banner);
-  });
   handleControls(controls,banners);
+  handleBannerRotation(banners);
 }
 
 const handleEmailAddress = () => {
@@ -420,9 +460,41 @@ const handleEmailAddress = () => {
   mail.text(adr);
 }
 
+const handleLoadImages = () => {
+  const content = $('.container');
+  const loader = $('#loader');
+  const images = [
+    banner_1,
+    banner_2,
+    banner_3,
+    banner_bg_image_1,
+    banner_bg_image_2,
+  ];
+
+  const imgsLoaded = images.map((image)=>{
+    return new Promise((resolve,reject)=>{
+      const img = new Image();
+      img.src = image;
+      img.onload = () => {
+        resolve(img);
+      };
+      img.onerror = (e) => {
+        reject(e);
+      };
+    });
+  });
+
+  Promise.all(imgsLoaded).then((images)=>{
+    loader.velocity('fadeOut',{duration:1000});
+    content.velocity('fadeIn',{duration:1000});
+  });
+}
+
+handleLoadImages();
+
 handleEmailAddress();
 initMap();
-handleScrolling('header-nav-wrapper', 100);
+handleScrolling('header-nav-wrapper', 50);
 handleButtonsOutline();
 handleNavSlideDown();
 handleBannerActions();
