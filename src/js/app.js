@@ -3,12 +3,23 @@ import '../scss/main.scss';
 import GoogleMapsLoader from 'google-maps';
 import velocity from 'velocity-animate';
 import Events from './events';
+
+//Images //
 import marker_icon from '../img/loc.svg';
 import banner_1 from '../img/banner_1.jpg';
 import banner_2 from '../img/banner_2.jpg';
 import banner_3 from '../img/banner_3.jpg';
 import banner_bg_image_1 from '../img/cloth_bg_1.jpg';
 import banner_bg_image_2 from '../img/cloth_bg_3.jpg';
+import gallery_item_1 from '../img/female.jpg';
+import gallery_item_2 from '../img/male.jpg';
+import gallery_item_3 from '../img/sport.jpg';
+import gallery_item_4 from '../img/casual.jpg';
+import news_item_1 from '../img/news_1.jpg';
+import news_item_2 from '../img/news_2.jpg';
+import news_item_3 from '../img/news_3.jpg';
+import news_item_4 from '../img/news_4.jpg';
+// Images END //
 
 //GOOGLE MAPS
 function initMap() {
@@ -20,15 +31,30 @@ function initMap() {
         scaledSize: new google.maps.Size(70,70),
       };
       const bounds = new google.maps.LatLngBounds();
-      const firstB = new google.maps.LatLng(37.739333, 49.175194);
-      const secondB = new google.maps.LatLng(58.730505, -13.269574);
+      const b1 = new google.maps.LatLng(37.739333, 49.175194);
+      const b2 = new google.maps.LatLng(58.730505, -13.269574);
       const center = new google.maps.LatLng(52.286983, 21.062947);
-      bounds.extend(firstB);
-      bounds.extend(secondB);
+      bounds.extend(b1);
+      bounds.extend(b2);
       const locations = [
-        [52.286983, 21.062947, '<h5>Poland</h5>'],
-        [51.514636, -0.179911, '<h5>England</h5>'],
-        [41.840964, 12.520881, '<h5>Italy</h5>'],
+        [ 52.286983,
+          21.062947,
+          '<h5>FashionTheme</h5>'+
+          '<h6>phone: +48 999 330 333</h6>'+
+          '<h6>email: contact@fasion.com</h6>'
+        ],
+        [ 51.514636,
+          -0.179911,
+          '<h5>FashionTheme</h5>'+
+          '<h6>phone: +48 999 330 333</h6>'+
+          '<h6>email: contact@fasion.com</h6>'
+        ],
+        [ 41.840964,
+          12.520881,
+          '<h5>FashionTheme</h5>'+
+          '<h6>phone: +48 999 330 333</h6>'+
+          '<h6>email: contact@fasion.com</h6>'
+        ],
       ];
       const addresses = locations.map((location)=>{
         return new Promise((resolve,reject)=>{
@@ -37,7 +63,7 @@ function initMap() {
               if (status === 'OK') {
                 resolve(results[0].formatted_address);
               }else if (status === 'ZERO_RESULTS') {
-                reject('load faild@!');
+                reject('load address faild@!');
               }
             })
         })
@@ -47,8 +73,8 @@ function initMap() {
         map.fitBounds(bounds);
         for (let i = 0; i < locations.length; i++) {
           const infowindow = new google.maps.InfoWindow({
-              content: locations[i][2]+'<p>'+items[i]+'</p>',
-              pixelOffset: new google.maps.Size(0,17)
+            content: locations[i][2]+'<p>'+items[i]+'</p>',
+            pixelOffset: new google.maps.Size(0,17)
           });
           const marker = new google.maps.Marker({
             position: new google.maps.LatLng(locations[i][0], locations[i][1]),
@@ -377,22 +403,26 @@ const handleBannerActions = () => {
     nx
     && !nx.query.hasClass('velocity-animating')
     && !cr.query.hasClass('velocity-animating')? (
-    cr.query.velocity({translateX: t[d][0]},{easing: 'easeOutSine',duration: 1000, complete: () => {
+    cr.query.velocity({translateX: t[d][0]},{easing: 'easeOutSine',duration: 1000,
+     complete: () => {
         cr.query.removeClass('current');
-      }}),
-    nx.query.velocity({translateX: t[d][1]},{easing: 'easeOutSine',duration: 1000, begin: () => {
-      nx.query.find('>*').velocity({opacity:0, translateY: '-50px'},{duration:0})}, complete: () => {
-        nx.query.addClass('current');
-        nx.query.find('h2').velocity('reverse',{duration:500, complete:() => {
-          nx.query.find('p').velocity('reverse', {duration: 500, complete: () => {
-            nx.query.find('button').velocity('reverse', {duration: 500});
-          }});
-        }});
+      }, begin: () => {
+        nx.query.velocity({translateX: t[d][1]},{easing: 'easeOutSine',duration: 1000, begin: () => {
+          nx.query.find('>*').velocity({opacity:0, translateY: '-50px'},{duration:0})}, complete: () => {
+            nx.query.addClass('current');
+            nx.query.find('h2').velocity('reverse',{duration:500, complete:() => {
+              nx.query.find('p').velocity('reverse', {duration: 500, complete: () => {
+                nx.query.find('button').velocity('reverse', {duration: 500});
+              }});
+            }});
+          }})
       }})
+
     ): false;
   }
   let dr = 0;
   const handleBannerRotation = (b) => {
+    clearTimeout(id);
     const id = setTimeout(()=>{
       const cr = $.map(b, (obj, index) => {
           if(obj.query.hasClass('current')) {
@@ -404,7 +434,6 @@ const handleBannerActions = () => {
       nx && !pr ? dr = 0:false;
       pr && !nx ? dr = 1:false;
       animBanner(dr,b);
-      clearTimeout(id);
       handleBannerRotation(b);
     }, 5000);
   }
@@ -428,19 +457,43 @@ const handleEmailAddress = () => {
   mail.text(adr);
 }
 
+
+const handleInjectImages = (images) => {
+  const imgs = Array.from($('img'));
+  const withId = imgs.filter((img)=>{
+    return img.dataset.id!==undefined;
+  });
+
+  const withSrc = withId.map((image,id)=>{
+    const img = image;
+    img.src = images[img.dataset.id].src;
+    return img;
+  });
+  return withSrc;
+}
+
 const handleLoadImages = () => {
   const images = [
     banner_1,
     banner_2,
     banner_3,
+    gallery_item_1,
+    gallery_item_2,
+    gallery_item_3,
+    gallery_item_4,
     banner_bg_image_1,
     banner_bg_image_2,
+    news_item_1,
+    news_item_2,
+    news_item_3,
+    news_item_4,
   ];
 
-  const imgsLoaded = images.map((image)=>{
+  const imgsLoaded = images.map((image,id)=>{
     return new Promise((resolve,reject)=>{
       const img = new Image();
       img.src = image;
+      img.dataset.id = id;
       img.onload = () => {
         resolve(img);
       };
@@ -457,6 +510,7 @@ const mainLoader = () => {
   const loader = $('#loader');
   const content = handleLoadImages();
   Promise.all(content).then((items)=>{
+    handleInjectImages(items);
     loader.velocity('fadeOut',{duration:1000});
     container.velocity('fadeIn',{duration:1000});
     handleBannerActions();
