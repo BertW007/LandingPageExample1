@@ -78,8 +78,9 @@ export default class Map extends Module {
                 pixelOffset: new this.mapsLoaded.Size(0,17)
               });
               infowindow.opened = false;
-              marker.addListener('click',() => {
-                let prev;
+              marker.set('optimized', false); // prevent memory leaks
+              const handleMarkerClick = (e) => {
+                let prev = [];
                 infowindow.opened === false?
                 (
                   prev = this.infowindows.filter((item) => {
@@ -93,7 +94,13 @@ export default class Map extends Module {
                   infowindow.opened = false,
                   infowindow.close(map, marker)
                 )
-              })
+              }
+              const remove = () => {
+                marker.removeListener('click', handleMarkerClick);
+                window.removeEventListener('unload', remove);
+              }
+              marker.addListener('click', handleMarkerClick);
+              window.addEventListener('unload', remove);
               return {
                 marker,
                 infowindow,

@@ -65,4 +65,3 @@ const appCreate = (app, config, logs) => {
 
 const app = appCreate(App, configCreate, logsCreate);
 app.start();
-console.log(app);
