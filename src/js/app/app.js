@@ -70,8 +70,49 @@ export default class App {
     }
     this.events.emit('RWU', removeEvent);
   }
+  handleEmailAddress() {
+    const mail = this.find('.contact-email');
+    const adr = mail.text().trim().toLowerCase().replace('(at)', '@').replace(/\(dot\)/g, '.');
+    mail.text(adr);
+  }
+  handleOutlines() {
+    const buttons = this.find('button');
+    const links = this.find('a');
+    const handleKey = (e) => {
+      const key = e.keyCode;
+      key === 9 &&
+      !buttons.hasClass('outline') &&
+      !links.hasClass('outline')?
+      (
+        buttons.addClass('outline'),
+        links.addClass('outline')
+      ):
+      false;
+    }
+    const handleClick = () => {
+      buttons.hasClass('outline') &&
+      links.hasClass('outline')?
+      (
+        buttons.removeClass('outline'),
+        links.removeClass('outline')
+      ):
+      false;
+    }
+    const removeKeyHandler = () => {
+      $(window).off('keydown', handleKey);
+    }
+    const removeClickHandler = () => {
+      $(window).off('click', handleClick);
+    }
+    $(window).on('keydown', handleKey);
+    $(window).on('click', handleClick);
+    this.events.emit('RWU', removeKeyHandler);
+    this.events.emit('RWU', removeClickHandler);
+  }
   init() {
     const eventData = {app: this.dom, loader: $('#loader')};
+    this.handleEmailAddress();
+    this.handleOutlines();
     Promise.all(this.loadImages).then(() => {
         this.createModules();
         this.initModules();
