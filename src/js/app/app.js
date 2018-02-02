@@ -31,7 +31,8 @@ export default class App {
           newModule.sub = this.events.on.bind(this.events),
           newModule.log = this.log,
           newModule.find = this.find.bind(this),
-          newModule.throwError = this.throwError
+          newModule.throwError = this.throwError,
+          newModule.registerDomEvent = this.registerDomEvent
         ):
         this.throwError('Module creation faild. New module should be an object');
         return newModule;
@@ -70,6 +71,16 @@ export default class App {
     }
     this.events.emit('RWU', removeEvent);
   }
+
+  registerDomEvent(element, type, fn) {
+    const target = this.rules._isString(element)? this.find(element): $(element);
+    target.on(type, fn);
+    const removeEvent = () => {
+      target.off(type, fn);
+    }
+    this.emit('RWU', removeEvent);
+  }
+
   handleEmailAddress() {
     const mail = this.find('.contact-email');
     const adr = mail.text().trim().toLowerCase().replace('(at)', '@').replace(/\(dot\)/g, '.');

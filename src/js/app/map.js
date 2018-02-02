@@ -1,8 +1,7 @@
-import Module from './module';
 import marker_icon from '../../img/loc.svg';
 import GoogleMapsLoader from 'google-maps';
 
-export default class Map extends Module {
+export default class Map {
 
   viewCreate(center, zoom, styles) {
     return {
@@ -96,7 +95,7 @@ export default class Map extends Module {
                 )
               }
               const remove = () => {
-                marker.removeListener('click', handleMarkerClick);
+                this.mapsLoaded.event.clearInstanceListeners(marker);
                 window.removeEventListener('unload', remove);
               }
               marker.addListener('click', handleMarkerClick);
@@ -119,10 +118,12 @@ export default class Map extends Module {
           e?
           this.map = new this.mapsLoaded.Map(document.getElementById(event.load),this.view):
           this.throwError('Error: Map load faild');
+          this.mapsLoaded.event.clearInstanceListeners(this.map);
           this.map.fitBounds(this.bounds);
           this.infowindowsCreate();
           const remove = () => {
             window.removeEventListener('resize', this.handleWindowResize.bind(this));
+            this.mapsLoaded.event.clearInstanceListeners(this.map);
             window.removeEventListener('unload', remove);
           }
           window.addEventListener('resize', this.handleWindowResize.bind(this));

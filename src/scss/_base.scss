@@ -182,17 +182,15 @@ form {
 
   .banner-content[data-id="0"] {
     background-image: url($banner-image_1);
-    transform: translateX(0);
   }
   .banner-content[data-id="1"] {
     background-image: url($banner-image_2);
-    transform: translateX(100%);
   }
   .banner-content[data-id="2"] {
     background-image: url($banner-image_3);
-    transform: translateX(100%);
   }
   .banner-content {
+    transform: translate3d(0,0,0);
     height: 100%;
     width: 100%;
     position: absolute;

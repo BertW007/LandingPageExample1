@@ -1,6 +1,4 @@
-import Module from './module';
-
-export default class Nav extends Module {
+export default class Nav {
 
   handleButtonClick() {
     this.button.attr('aria-pressed') === 'false'?
@@ -14,7 +12,7 @@ export default class Nav extends Module {
     (
       this.button.addClass('nav-open'),
       this.button.removeClass('nav-close')
-    )
+    );
     this.nav.slideToggle('slow');
     this.nav.attr('aria-expanded') === 'false'?
     this.nav.attr('aria-expanded', 'true'):
