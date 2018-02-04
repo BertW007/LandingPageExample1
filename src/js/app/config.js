@@ -10,7 +10,6 @@ const configCreate = () => {
       LANG: { default: 'en' },
       MODULES: [
         Banner,
-        GoogleMap,
         Nav,
       ],
       RULES: {

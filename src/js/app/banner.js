@@ -40,7 +40,9 @@ export default class Banner {
 
   getParameters() {
     return {
-      nx: this.getAbsNext(),
+      anx: this.getAbsNext(),
+      nx: this.getNext(),
+      pr: this.getPrev(),
       cr: this.getCurrent(),
       dr: this.getDirection(),
     }
@@ -79,10 +81,10 @@ export default class Banner {
 
   handleNextIn() {
       let d = this.getParameters();
-      const remove = this.handleComplete(d.nx,d.cr);
+      const remove = this.handleComplete(d.anx,d.cr);
 
-      d.nx.css('display','flex');
-      d.nx.velocity('stop').velocity(
+      d.anx.css('display','flex');
+      d.anx.velocity('stop').velocity(
         {translateX: this.transitions[d.dr][1]},
         {
           easing: 'easeOutCubic',
@@ -95,7 +97,7 @@ export default class Banner {
 
   handleCurrentOut() {
     let d = this.getParameters();
-    d.nx.length > 0?
+    d.anx.length > 0?
     d.cr.velocity('stop').velocity(
       {translateX: this.transitions[d.dr][0]},
       {
@@ -110,10 +112,7 @@ export default class Banner {
 
   rotateBanner() {
     const nextRotation = () => {
-      let d = {
-        nx: this.getNext(),
-        pr: this.getPrev(),
-      };
+      let d = this.getParameters();
 
       d.nx && !d.pr ? this.setDirection(0):false;
       d.pr && !d.nx ? this.setDirection(1):false;
