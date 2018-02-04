@@ -1,8 +1,26 @@
 export default class Banner {
   constructor() {
     this.direction = 0;
-    this.transitions = [[['-100%'],['0%','100%']],[['100%','0%'],['0%']]];
+    this.transitions = [
+      [['-100%'],['0%','100%']],
+      [['100%','0%'],['0%']]];
     this.delay = 5000;
+  }
+
+  getDirection() {
+    return this.direction;
+  }
+
+  setDirection(direction) {
+    this.direction = direction;
+  }
+
+  getNext() {
+    return this.banners[this.banners.index(this.getCurrent())+1];
+  }
+
+  getPrev() {
+    return this.banners[this.banners.index(this.getCurrent())-1];
   }
 
   getCurrent() {
@@ -11,95 +29,106 @@ export default class Banner {
     });
   }
 
-  handleClick(e) {
-    let direction,
-        next,
-        current = this.getCurrent(),
-        button = $(e.target);
 
-    button.hasClass('banner-controls-left')?
-    (
-      direction = 1,
-      next = $(this.banners[this.banners.index(current)-1])
-    ):
-    (
-      direction = 0,
-      next = $(this.banners[this.banners.index(current)+1])
-    );
-
-    next.length > 0 &&
-    !next.hasClass('velocity-animating') &&
-    !current.hasClass('velocity-animating')?
-     (
-       clearTimeout(this.id),
-       this.handleAnimation(current, next, direction, this.rotateBanner.bind(this))
-     ): false;
+  getAbsNext() {
+    let n = this.getNext();
+    const p = this.getPrev(),
+          dr = this.getDirection();
+    dr === 0? n = $(n): n = $(p);
+    return n;
   }
 
-  handleAnimation(c, n, d, fn) {
+  getParameters() {
+    return {
+      nx: this.getAbsNext(),
+      cr: this.getCurrent(),
+      dr: this.getDirection(),
+    }
+  }
 
-    const handleNextIn = () => {
+  handleClick(e) {
 
-      const handleComplete = () => {
-        n.addClass('current');
-        fn? fn(): false;
-        fn = null;
-        n = null;
+    let d = {
+      bt: $(e.target),
+      nx: $(this.getNext()),
+    }
+
+    d.bt.hasClass('banner-controls-left')?
+    this.setDirection(1):
+    this.setDirection(0);
+
+    !d.nx.hasClass('velocity-animating') &&
+    !d.nx.hasClass('velocity-animating')?
+    this.handleCurrentOut():
+    false;
+
+    d = {};
+  }
+
+  handleComplete(n,c) {
+    let d = {
+        cr: c,
+        nx: n,
+    }
+    return function remove() {
+      d.cr.removeClass('current');
+      d.nx.addClass('current');
+      d = {};
+    }
+  }
+
+  handleNextIn() {
+      let d = this.getParameters();
+      const remove = this.handleComplete(d.nx,d.cr);
+
+      d.nx.css('display','flex');
+      d.nx.velocity('stop').velocity(
+        {translateX: this.transitions[d.dr][1]},
+        {
+          easing: 'easeOutCubic',
+          duration: 1000,
+          complete: remove,
+        }
+      );
+      d = {};
+  }
+
+  handleCurrentOut() {
+    let d = this.getParameters();
+    d.nx.length > 0?
+    d.cr.velocity('stop').velocity(
+      {translateX: this.transitions[d.dr][0]},
+      {
+        easing: 'easeOutCubic',
+        duration: 1000,
+        begin: this.handleNextIn.apply(this),
+        complete: this.rotateBanner.apply(this),
       }
-
-      n.css('display','flex');
-      n.velocity('stop').velocity(
-        {translateX: this.transitions[d][1]},
-        {
-          easing: 'easeOutCubic',
-          duration: 1000,
-          complete: handleComplete
-        }
-      );
-    }
-
-    const handleRemoveCurrent = () => {
-      c.removeClass('current');
-      c = null;
-    }
-
-    const handleCurrentOut = () => {
-      c.velocity('stop').velocity(
-        {translateX: this.transitions[d][0]},
-        {
-          easing: 'easeOutCubic',
-          duration: 1000,
-          complete: handleRemoveCurrent,
-          begin: handleNextIn
-        }
-      );
-    }
-    handleCurrentOut();
+    ):false;
+    d = {};
   }
 
   rotateBanner() {
     const nextRotation = () => {
-      let cr = this.getCurrent(),
-          nx = this.banners[this.banners.index(cr)+1],
-          pr = this.banners[this.banners.index(cr)-1];
-      nx && !pr ? this.direction = 0:false;
-      pr && !nx ? this.direction = 1:false;
-      this.direction===0? false: nx = pr;
-      nx = $(nx);
-      this.handleAnimation(cr, nx, this.direction, this.rotateBanner.bind(this));
+      let d = {
+        nx: this.getNext(),
+        pr: this.getPrev(),
+      };
+
+      d.nx && !d.pr ? this.setDirection(0):false;
+      d.pr && !d.nx ? this.setDirection(1):false;
+      this.handleCurrentOut();
+      d = {};
     }
     clearTimeout(this.id);
     this.id = setTimeout(nextRotation, this.delay);
   }
 
-  initBanner() {
-    this.sub('ACL', this.rotateBanner.bind(this));
-  }
 
   init() {
     this.banners = this.find('.banner-content');
-    this.initBanner();
     this.registerDomEvent('.banner-controls-left', 'click', this.handleClick.bind(this));
     this.registerDomEvent('.banner-controls-right', 'click', this.handleClick.bind(this));
+    this.rotateBanner();
   };
 }

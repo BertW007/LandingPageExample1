@@ -122,7 +122,7 @@ export default class App {
   }
   init() {
     const eventData = {app: this.dom, loader: $('#loader')};
-    this.handleEmailAddress();
+    //this.handleEmailAddress();
     this.handleOutlines();
     Promise.all(this.loadImages).then(() => {
         this.createModules();
