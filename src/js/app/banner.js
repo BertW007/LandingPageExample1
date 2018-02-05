@@ -7,21 +7,6 @@ export default class Banner {
     this.leftButtonId = '.banner-controls-left';
     this.rightButtonId = '.banner-controls-right';
   }
-  getCurrentId() {
-    return this.currentId;
-  }
-
-  getBannersId() {
-    return this.bannersId;
-  }
-
-  getLeftButtonId() {
-    return this.leftButtonId;
-  }
-
-  getRightButtonId() {
-    return this.rightButtonId;
-  }
 
   getDirection() {
     return this.direction;
@@ -41,8 +26,12 @@ export default class Banner {
 
   getCurrent() {
     return this.banners.filter((key, banner) => {
-      return $(banner).hasClass(this.getCurrentId()) && !$(banner).hasClass('velocity-animating')? banner: false;
+      return $(banner).hasClass(this.currentId) && !this.isAnimating(banner)? banner: false;
     });
+  }
+
+  isAnimating(item) {
+    return $(item).hasClass('velocity-animating');
   }
 
   getAbsNext() {
@@ -69,7 +58,7 @@ export default class Banner {
     }
   }
 
-  getAnimParameters(tr,es,dr,bg,cp) {
+  getAnimParameters(tr, es, dr, bg, cp) {
     return [
       {translateX: tr},
       {
@@ -85,24 +74,25 @@ export default class Banner {
 
     let d = {
       bt: $(e.target),
-      nx: $(this.getNext()),
+      nx: this.getNext(),
+      cr: this.getCurrent(),
     }
 
-    d.bt.hasClass('banner-controls-left')?
+    d.bt.hasClass('banner-controls-left') ?
     this.setDirection(1):
     this.setDirection(0);
-
-    !d.nx.hasClass('velocity-animating') &&
-    !d.nx.hasClass('velocity-animating')?
-    this.handleCurrentOut():
-    false;
+    this.isAnimating(d.cr) ||
+    this.isAnimating(d.nx) ||
+    d.cr.length !== 1?
+    false:
+    this.handleCurrentOut();
 
     d = {};
   }
 
   handleComplete(n,c) {
     let d = {
-        cr: {el: c, id: this.getCurrentId()},
+        cr: {el: c, id: this.currentId},
         nx: n,
     }
     return function remove() {
@@ -122,7 +112,6 @@ export default class Banner {
             this.handleComplete(d.anx,d.cr)
           );
 
-      d.anx.css('display','flex');
       this.anim(d.anx, a[0],a[1]);
 
       d = {};
@@ -160,9 +149,9 @@ export default class Banner {
 
 
   init() {
-    this.banners = this.find(this.getBannersId());
-    this.registerDomEvent(this.getLeftButtonId(), 'click', this.handleClick.bind(this));
-    this.registerDomEvent(this.getRightButtonId(), 'click', this.handleClick.bind(this));
+    this.banners = this.find(this.bannersId);
+    this.registerDomEvent(this.leftButtonId, 'click', this.handleClick.bind(this));
+    this.registerDomEvent(this.rightButtonId, 'click', this.handleClick.bind(this));
     this.rotateBanner();
   };
 }
