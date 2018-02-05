@@ -1,6 +1,7 @@
 import Banner from './banner';
 import GoogleMap from './map';
 import Nav from './nav';
+import Outlines from './outlines';
 
 const configCreate = () => {
   const config = {
@@ -11,6 +12,7 @@ const configCreate = () => {
       MODULES: [
         Banner,
         Nav,
+        Outlines,
       ],
       RULES: {
         _isFunction: (functionToCheck) => {
