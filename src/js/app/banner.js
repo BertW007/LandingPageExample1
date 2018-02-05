@@ -86,20 +86,19 @@ export default class Banner {
     d.cr.length !== 1?
     false:
     this.handleCurrentOut();
-
     d = {};
   }
 
-  handleComplete(n,c) {
-    let d = {
-        cr: {el: c, id: this.currentId},
-        nx: n,
+  handleComplete() {
+    this.cr = this.getCurrent();
+    this.nx = this.getAbsNext();
+    const remove = () => {
+      this.cr.removeClass(this.currentId);
+      this.nx.addClass(this.currentId);
+      delete this.cr;
+      delete this.nx;
     }
-    return function remove() {
-      d.cr.el.removeClass(d.cr.id);
-      d.nx.addClass(d.cr.id);
-      d = {};
-    }
+    return remove;
   }
 
   handleNextIn() {
@@ -109,11 +108,10 @@ export default class Banner {
             d.es,
             d.at,
             null,
-            this.handleComplete(d.anx,d.cr)
+            this.handleComplete()
           );
 
       this.anim(d.anx, a[0],a[1]);
-
       d = {};
       a = [];
   }
