@@ -32,7 +32,8 @@ export default class App {
           newModule.log = this.log,
           newModule.find = this.find.bind(this),
           newModule.throwError = this.throwError,
-          newModule.registerDomEvent = this.registerDomEvent
+          newModule.registerDomEvent = this.registerDomEvent,
+          newModule.anim = this.anim
         ):
         this.throwError('Module creation faild. New module should be an object');
         return newModule;
@@ -53,23 +54,6 @@ export default class App {
     catch(e) {
       this.log(e);
     }
-  }
-  handleChangeOnScrolling(elm,position) {
-    const doc = document.documentElement;
-    const element = elm;
-    const toggleClass = () => {
-      let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-      top > position?
-      element.hasClass('scrolling')?
-        false: element.addClass('scrolling'):
-      element.removeClass('scrolling');
-    }
-    const eventData = {element: $(window), type: 'scroll', fn: toggleClass};
-    eventData.element.on(eventData.type, eventData.fn);
-    const removeEvent = () => {
-      eventData.element.off(eventData.type, eventData.fn);
-    }
-    this.events.emit('RWU', removeEvent);
   }
 
   registerDomEvent(element, type, fn) {
@@ -120,6 +104,12 @@ export default class App {
     this.events.emit('RWU', removeKeyHandler);
     this.events.emit('RWU', removeClickHandler);
   }
+  anim(element, options, parameters) {
+    element.velocity('stop').velocity(
+      options,
+      parameters
+    )
+  }
   init() {
     const eventData = {app: this.dom, loader: $('#loader')};
     //this.handleEmailAddress();
@@ -129,7 +119,6 @@ export default class App {
         this.initModules();
         delete this.loadImages;
         this.events.emit('DCL', eventData);
-        this.handleChangeOnScrolling(this.dom.find('.header-nav-wrapper'), 50);
     })
   };
 }

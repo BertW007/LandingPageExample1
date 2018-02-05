@@ -3,25 +3,17 @@ export default class Nav {
     this.slideSpeed = 'slow';
     this.buttonId = '.toggle-nav';
     this.contentId = 'nav';
-    this.eventId = 'click';
+    this.wrapperId = '.header-nav-wrapper';
     this.buttonStateId = 'aria-pressed';
     this.contentStateId = 'aria-expanded';
     this.buttonStateVariants = [
       'nav-close',
       'nav-open',
     ];
-  }
-
-  getButtonId() {
-    return this.buttonId || false;
-  }
-
-  getContentId() {
-    return this.contentId || false;
-  }
-
-  getEventId() {
-    return this.eventId || false;
+    this.wrapperStateVariants = [
+      'scrolling',
+    ];
+    this.wrapperChangePosition = 50;
   }
 
   getButtonState() {
@@ -67,9 +59,22 @@ export default class Nav {
     this.toggleContent();
   }
 
+  getScrollPosition() {
+    return (window.pageYOffset || document.documentElement.scrollTop) - (document.documentElement.clientTop || 0);
+  }
+
+  toggleWrapper() {
+    this.getScrollPosition() > this.wrapperChangePosition?
+    this.wrapper.hasClass(this.wrapperStateVariants[0])?
+      false: this.wrapper.addClass(this.wrapperStateVariants[0]):
+    this.wrapper.removeClass(this.wrapperStateVariants[0]);
+  }
+
   init() {
-    this.content = this.find(this.getContentId());
-    this.button = this.find(this.getButtonId());
-    this.registerDomEvent(this.getButtonId(), this.getEventId(), this.handleButtonClick.bind(this));
+    this.content = this.find(this.contentId);
+    this.button = this.find(this.buttonId);
+    this.wrapper = this.find(this.wrapperId);
+    this.registerDomEvent(window, 'scroll', this.toggleWrapper.bind(this));
+    this.registerDomEvent(this.buttonId, 'click', this.handleButtonClick.bind(this));
   };
 }

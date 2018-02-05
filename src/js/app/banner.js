@@ -1,10 +1,26 @@
 export default class Banner {
   constructor() {
     this.direction = 0;
-    this.transitions = [
-      [['-100%'],['0%','100%']],
-      [['100%','0%'],['0%']]];
     this.delay = 5000;
+    this.currentId = 'current';
+    this.bannersId = '.banner-content';
+    this.leftButtonId = '.banner-controls-left';
+    this.rightButtonId = '.banner-controls-right';
+  }
+  getCurrentId() {
+    return this.currentId;
+  }
+
+  getBannersId() {
+    return this.bannersId;
+  }
+
+  getLeftButtonId() {
+    return this.leftButtonId;
+  }
+
+  getRightButtonId() {
+    return this.rightButtonId;
   }
 
   getDirection() {
@@ -25,10 +41,9 @@ export default class Banner {
 
   getCurrent() {
     return this.banners.filter((key, banner) => {
-      return $(banner).hasClass('current') && !$(banner).hasClass('velocity-animating')? banner: false;
+      return $(banner).hasClass(this.getCurrentId()) && !$(banner).hasClass('velocity-animating')? banner: false;
     });
   }
-
 
   getAbsNext() {
     let n = this.getNext();
@@ -45,7 +60,25 @@ export default class Banner {
       pr: this.getPrev(),
       cr: this.getCurrent(),
       dr: this.getDirection(),
+      es: 'easeOutCubic',
+      at: 1000,
+      tr: [
+        [['-100%'],['0%','100%']],
+        [['100%','0%'],['0%']]
+      ]
     }
+  }
+
+  getAnimParameters(tr,es,dr,bg,cp) {
+    return [
+      {translateX: tr},
+      {
+        easing: es,
+        duration: dr,
+        begin: bg,
+        complete: cp,
+      }
+    ];
   }
 
   handleClick(e) {
@@ -69,45 +102,47 @@ export default class Banner {
 
   handleComplete(n,c) {
     let d = {
-        cr: c,
+        cr: {el: c, id: this.getCurrentId()},
         nx: n,
     }
     return function remove() {
-      d.cr.removeClass('current');
-      d.nx.addClass('current');
+      d.cr.el.removeClass(d.cr.id);
+      d.nx.addClass(d.cr.id);
       d = {};
     }
   }
 
   handleNextIn() {
-      let d = this.getParameters();
-      const remove = this.handleComplete(d.anx,d.cr);
+      let d = this.getParameters(),
+          a = this.getAnimParameters(
+            d.tr[d.dr][1],
+            d.es,
+            d.at,
+            null,
+            this.handleComplete(d.anx,d.cr)
+          );
 
       d.anx.css('display','flex');
-      d.anx.velocity('stop').velocity(
-        {translateX: this.transitions[d.dr][1]},
-        {
-          easing: 'easeOutCubic',
-          duration: 1000,
-          complete: remove,
-        }
-      );
+      this.anim(d.anx, a[0],a[1]);
+
       d = {};
+      a = [];
   }
 
   handleCurrentOut() {
-    let d = this.getParameters();
+    let d = this.getParameters(),
+        a = this.getAnimParameters(
+          d.tr[d.dr][0],
+          d.es,
+          d.at,
+          this.handleNextIn.apply(this),
+          this.rotateBanner.apply(this)
+        );
+
     d.anx.length > 0?
-    d.cr.velocity('stop').velocity(
-      {translateX: this.transitions[d.dr][0]},
-      {
-        easing: 'easeOutCubic',
-        duration: 1000,
-        begin: this.handleNextIn.apply(this),
-        complete: this.rotateBanner.apply(this),
-      }
-    ):false;
+    this.anim(d.cr, a[0],a[1]): false;
     d = {};
+    a = [];
   }
 
   rotateBanner() {
@@ -125,9 +160,9 @@ export default class Banner {
 
 
   init() {
-    this.banners = this.find('.banner-content');
-    this.registerDomEvent('.banner-controls-left', 'click', this.handleClick.bind(this));
-    this.registerDomEvent('.banner-controls-right', 'click', this.handleClick.bind(this));
+    this.banners = this.find(this.getBannersId());
+    this.registerDomEvent(this.getLeftButtonId(), 'click', this.handleClick.bind(this));
+    this.registerDomEvent(this.getRightButtonId(), 'click', this.handleClick.bind(this));
     this.rotateBanner();
   };
 }
