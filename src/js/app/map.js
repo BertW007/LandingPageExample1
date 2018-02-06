@@ -1,367 +1,194 @@
 import marker_icon from '../../img/loc.svg';
+import style from './mapstyle';
 import GoogleMapsLoader from 'google-maps';
 
-export default class Map {
-
-  viewCreate(center, zoom, styles) {
-    return {
-      center: center,
-      zoom: zoom,
+export default class GoogleMap {
+  constructor() {
+    this.mapId = '#map';
+    this.style = style;
+    this.center = ['52.286983', '21.062947'];
+    this.bounds = [
+      ['37.739333', '49.175194'],
+      ['58.730505', '-13.269574'],
+    ];
+    this.errors = {
+      mapLoad: 'Unable to load google maps',
+      addressLoad: 'Unable to load one or more addresses',
+    }
+    this.geocodeStatusVariants = [
+      'OK',
+      'ZERO_RESULTS',
+    ]
+    this.locations = [
+      {
+        lat: '52.286983',
+        lng: '21.062947',
+        header: 'FashionTheme',
+        phone: '+48 999 330 333',
+        email: 'contact1@fasion.com'
+      },
+      {
+        lat: '51.514636',
+        lng: '-0.179911',
+        header: 'FashionTheme',
+        phone: '+48 799 330 333',
+        email: 'contact2@fasion.com'
+      },
+      {
+        lat: '41.840964',
+        lng: '12.520881',
+        header: 'FashionTheme',
+        phone: '+48 899 330 433',
+        email: 'contact3@fasion.com'
+      },
+    ];
+    this.view = {
+      zoom: 4,
       scrollwheel: false,
       disableDefaultUI: true,
-      styles: styles,
+      styles: this.style,
     }
   }
 
-  handleWindowResize() {
-    this.mapsLoaded.event.trigger(this.map, "resize");
-    this.map.fitBounds(this.bounds);
-    this.map.setCenter(this.center);
-  }
-  mapCreate() {
-    return new Promise((resolve,reject)=>{
-      this.view? resolve(true):
-      reject(false);
+  addressesLoad() {
+    this.addresses = this.locations.map((location) => {
+    return new Promise((resolve,reject) => {
+        this.geocoder.geocode( {location: new this.maps.LatLng(location.lat, location.lng)}, (results, status) => {
+          if (status === this.geocodeStatusVariants[0]) {
+            resolve(results[0].formatted_address);
+          } else if (status === this.geocodeStatusVariants[1]) {
+            this.throwError(this.error.addressLoad),
+            reject('Address load faild');
+          }
+        });
+      });
     });
   }
-  init() {
+
+  createBounds() {
+    const b = new this.maps.LatLngBounds();
+    b.extend(new this.maps.LatLng(this.bounds[0][0],this.bounds[0][1]));
+    b.extend(new this.maps.LatLng(this.bounds[1][0],this.bounds[1][1]));
+    this.bounds = b;
+  }
+
+  createMarkers() {
+    const img = new Image();
+    img.src = marker_icon;
+    $(this.mapId).append(img);
+
+    this.markers = this.locations.map((location,key) => {
+      const marker =  new this.maps.Marker({
+        position: new this.maps.LatLng(location.lat, location.lng),
+        animation: this.maps.Animation.DROP,
+        map: this.map,
+        icon: img.src,
+        optimized: false,
+        infowindow: this.infowindows[key],
+        infowindowsClose: () => {
+          this.infowindows.forEach((infowindow) => {
+            infowindow.close(this.map, this.markers[infowindow.markerId]);
+            infowindow.opened = false;
+          });
+        },
+      });
+      const removeMarkerEvent = () => {
+        this.maps.event.clearInstanceListeners(this.map, marker);
+      }
+      this.maps.event.addListener(marker, 'click', this.handleMarkerClick);
+      this.emit('RWU', removeMarkerEvent);
+      return marker;
+    });
+  }
+
+  createInfowindows() {
+    this.infowindows = this.locations.map((location,key) => {
+      const header = $('<h5>').text(location.header),
+            phone = $('<h6>').text(location.phone),
+            email = $('<h6>').text(location.email),
+            content = $('<div>'),
+            address = $('<p>').text(this.addresses[key]);
+
+      content.append(header).append(phone).append(email).append(address);
+      $(this.mapId).append(content);
+
+      return new this.maps.InfoWindow({
+        content: content[0],
+        pixelOffset: new this.maps.Size(0,17),
+        opened: false,
+        markerId: key
+      });
+    });
+  }
+
+  handleMarkerClick() {
+    this.infowindow.opened?
+    this.infowindow.close(this.map, this):
+    (
+      this.infowindowsClose(),
+      this.infowindow.open(this.map, this),
+      this.infowindow.opened = true
+    )
+  }
+
+  createMap() {
+    this.createBounds();
+    this.center = new this.maps.LatLng(this.center[0], this.center[1]);
+    this.map = new this.maps.Map($(this.mapId)[0], this.view);
+    this.map.setCenter(this.center);
+    this.map.fitBounds(this.bounds);
+    this.createInfowindows();
+    this.createMarkers();
+    delete this.view;
+    delete this.style;
+    delete this.locations;
+    delete this.addresses;
+  }
+
+  handleMapResize() {
+    this.map && this.maps?
+    (
+      this.map.fitBounds(this.bounds),
+      this.map.setCenter(this.center),
+      this.maps.event.trigger(this.map, 'resize')
+    ): false;
+  }
+
+  mapLoad() {
     try {
       this.maps = new Promise((resolve,reject) => {
         GoogleMapsLoader.LANGUAGE = this.lang;
-        GoogleMapsLoader.load(function(google) {
+        GoogleMapsLoader.load((google) => {
           google?
           resolve(google.maps):
           (
-            reject(false),
-            this.throwError('Unable to load google maps')
+            this.throwError(this.error.mapLoad)
           )
-        })
-      });
-    } catch(e) {
-      this.log(e);
-    }
-
-    try {
-      this.maps.then((maps) => {
-        this.mapsLoaded = maps;
-        this.geocoder = new this.mapsLoaded.Geocoder;
-        this.bounds = new this.mapsLoaded.LatLngBounds();
-        this.bounds.extend(new this.mapsLoaded.LatLng(bounds[0][0],bounds[0][1]));
-        this.bounds.extend(new this.mapsLoaded.LatLng(bounds[1][0],bounds[1][1]));
-        this.center = new this.mapsLoaded.LatLng(center[0], center[1]);
-        this.view = this.viewCreate(this.center, 4, style);
-        this.addresses = locations.map((location) => {
-          return new Promise((resolve,reject) => {
-            const loc =  new this.mapsLoaded.LatLng(location[0], location[1]);
-              this.geocoder.geocode({location: loc}, (results, status)=>{
-                if (status === 'OK') {
-                  resolve(results[0].formatted_address);
-                } else if (status === 'ZERO_RESULTS') {
-                  this.throwError('Unable to load one or more addresses'),
-                  reject('address load faild');
-                }
-              });
-            });
-          });
-        Promise.all(this.addresses).then((addresses) => {
-          this.infowindowsCreate = () => {
-            this.infowindows = locations.map((location,key) => {
-              const marker = new this.mapsLoaded.Marker({
-                position: new this.mapsLoaded.LatLng(location[0], location[1]),
-                animation: this.mapsLoaded.Animation.DROP,
-                map: this.map,
-                icon: marker_icon
-              });
-              const infowindow = new this.mapsLoaded.InfoWindow({
-                content: location[2]+'<p>'+addresses[key]+'</p>',
-                pixelOffset: new this.mapsLoaded.Size(0,17)
-              });
-              infowindow.opened = false;
-              marker.set('optimized', false); // prevent memory leaks
-              const handleMarkerClick = (e) => {
-                let prev = [];
-                infowindow.opened === false?
-                (
-                  prev = this.infowindows.filter((item) => {
-                    return item.infowindow.opened === true;
-                  }),
-                  prev.length>0? prev.forEach((p)=>{p.infowindow.close(this.map, p.marker)}): false,
-                  infowindow.open(this.map, marker),
-                  infowindow.opened = true
-                ):
-                (
-                  infowindow.opened = false,
-                  infowindow.close(map, marker)
-                )
-              }
-              const remove = () => {
-                this.mapsLoaded.event.clearInstanceListeners(marker);
-                window.removeEventListener('unload', remove);
-              }
-              marker.addListener('click', handleMarkerClick);
-              window.addEventListener('unload', remove);
-              return {
-                marker,
-                infowindow,
-              };
-            });
-          }
         });
       });
     } catch(e) {
       this.log(e);
     }
-    try {
-      this.sub('ACL',(event) => {
-        const m = this.mapCreate();
-        m.then((e) => {
-          e?
-          this.map = new this.mapsLoaded.Map(document.getElementById(event.load),this.view):
-          this.throwError('Error: Map load faild');
-          this.mapsLoaded.event.clearInstanceListeners(this.map);
-          this.map.fitBounds(this.bounds);
-          this.infowindowsCreate();
-          const remove = () => {
-            window.removeEventListener('resize', this.handleWindowResize.bind(this));
-            this.mapsLoaded.event.clearInstanceListeners(this.map);
-            window.removeEventListener('unload', remove);
-          }
-          window.addEventListener('resize', this.handleWindowResize.bind(this));
-          window.addEventListener('unload', remove);
-        });
-      });
-    } catch (e) {
-      this.log(e);
-    }
-  };
-}
-
-const locations = [
-  [ '52.286983',
-    '21.062947',
-    '<h5>FashionTheme</h5>'+
-    '<h6>phone: +48 999 330 333</h6>'+
-    '<h6>email: contact@fasion.com</h6>'
-  ],
-  [ '51.514636',
-    '-0.179911',
-    '<h5>FashionTheme</h5>'+
-    '<h6>phone: +48 999 330 333</h6>'+
-    '<h6>email: contact@fasion.com</h6>'
-  ],
-  [ '41.840964',
-    '12.520881',
-    '<h5>FashionTheme</h5>'+
-    '<h6>phone: +48 999 330 333</h6>'+
-    '<h6>email: contact@fasion.com</h6>'
-  ],
-];
-const style = [
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#212121"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        visibility: "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.country",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#bdbdbd"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#181818"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#1b1b1b"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#2c2c2c"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#8a8a8a"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#373737"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "labels",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#3c3c3c"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway.controlled_access",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#4e4e4e"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#000000"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#3d3d3d"
-      }
-    ]
+    this.mapInit();
   }
-];
-const bounds = [
-  ['37.739333', '49.175194'],
-  ['58.730505', '-13.269574'],
-];
-const center = ['52.286983', '21.062947'];
+
+  mapInit() {
+    this.maps.then((maps) => {
+      this.maps = maps;
+      maps = {};
+      this.geocoder = new this.maps.Geocoder;
+      this.addressesLoad();
+      Promise.all(this.addresses).then((addresses) => {
+        this.addresses = addresses;
+        delete this.geocoder;
+        this.sub('ACL', this.createMap.bind(this));
+      });
+    });
+  }
+
+  init() {
+    this.mapLoad();
+    this.registerDomEvent(window, 'resize', this.handleMapResize.bind(this));
+  }
+
+}

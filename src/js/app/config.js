@@ -13,6 +13,7 @@ const configCreate = () => {
         Banner,
         Nav,
         Outlines,
+        GoogleMap,
       ],
       RULES: {
         _isFunction: (functionToCheck) => {
