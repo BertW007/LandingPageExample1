@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import velocity from 'velocity-animate';
 import Events from './events';
 import loaderCreate from './loader';
 

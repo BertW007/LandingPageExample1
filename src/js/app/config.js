@@ -2,6 +2,7 @@ import Banner from './banner';
 import GoogleMap from './map';
 import Nav from './nav';
 import Outlines from './outlines';
+import Features from './features';
 
 const configCreate = () => {
   const config = {
@@ -13,6 +14,7 @@ const configCreate = () => {
         Banner,
         Nav,
         Outlines,
+        Features,
         GoogleMap,
       ],
       RULES: {

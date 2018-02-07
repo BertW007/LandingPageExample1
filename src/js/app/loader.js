@@ -1,4 +1,3 @@
-import velocity from 'velocity-animate';
 import banner_1 from '../../img/banner_1.jpg';
 import banner_2 from '../../img/banner_2.jpg';
 import banner_3 from '../../img/banner_3.jpg';

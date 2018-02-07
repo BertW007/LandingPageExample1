@@ -91,15 +91,33 @@ export default class Banner {
     d = {};
   }
 
+  handleNextContentIn() {
+    let d = this.getParameters(),
+        i = this.anx.find('>*'),
+        a = this.getAnimParameters(
+          d.tr[2],
+          d.es,
+          d.at,
+          null,
+          null,
+          1
+        );
+    this.anim(i, a[0],a[1]);
+
+    d = {};
+    i = {};
+    d = [];
+  }
+
   handleComplete() {
     this.cr = this.getCurrent();
-    this.nx = this.getAbsNext();
+    this.anx = this.getAbsNext();
     const remove = () => {
       this.cr.removeClass(this.currentId);
-      this.nx.addClass(this.currentId);
+      this.anx.addClass(this.currentId);
       this.handleNextContentIn();
       delete this.cr;
-      delete this.nx;
+      delete this.anx;
     }
     return remove;
   }
@@ -136,29 +154,9 @@ export default class Banner {
     a = [];
   }
 
-  handleNextContentIn() {
-    let d = this.getParameters(),
-        i = this.nx.find('>*'),
-        a = this.getAnimParameters(
-          d.tr[2],
-          d.es,
-          d.at,
-          null,
-          null,
-          1
-        );
-    i.each((key,item) => {
-      this.anim(i, a[0],a[1]);
-    });
-    d = {};
-    i = {};
-    d = [];
-  }
-
   rotateBanner() {
     const nextRotation = () => {
       let d = this.getParameters();
-
       d.nx && !d.pr ? this.setDirection(0):false;
       d.pr && !d.nx ? this.setDirection(1):false;
       this.handleCurrentOut();
