@@ -73,16 +73,13 @@ export default class GoogleMap {
   }
 
   createMarkers() {
-    const img = new Image();
-    img.src = marker_icon;
-    $(this.mapId).append(img);
 
     this.markers = this.locations.map((location,key) => {
       const marker =  new this.maps.Marker({
         position: new this.maps.LatLng(location.lat, location.lng),
         animation: this.maps.Animation.DROP,
         map: this.map,
-        icon: img.src,
+        icon: marker_icon,
         optimized: false,
         infowindow: this.infowindows[key],
         infowindowsClose: () => {

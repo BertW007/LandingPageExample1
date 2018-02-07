@@ -53,14 +53,16 @@ export default class Banner {
       at: 1000,
       tr: [
         [['-100%'],['0%','100%']],
-        [['100%','0%'],['0%']]
+        [['100%','0%'],['0%']],
+        ['0px', '-50px']
       ]
     }
   }
 
-  getAnimParameters(tr, es, dr, bg, cp) {
+  getAnimParameters(tr, es, dr, bg, cp, tt) {
+    const trs = tt? {translateY: tr}: {translateX: tr};
     return [
-      {translateX: tr},
+      trs,
       {
         easing: es,
         duration: dr,
@@ -95,6 +97,7 @@ export default class Banner {
     const remove = () => {
       this.cr.removeClass(this.currentId);
       this.nx.addClass(this.currentId);
+      this.handleNextContentIn();
       delete this.cr;
       delete this.nx;
     }
@@ -108,9 +111,9 @@ export default class Banner {
             d.es,
             d.at,
             null,
-            this.handleComplete()
+            this.handleComplete(),
+            null
           );
-
       this.anim(d.anx, a[0],a[1]);
       d = {};
       a = [];
@@ -123,13 +126,33 @@ export default class Banner {
           d.es,
           d.at,
           this.handleNextIn.apply(this),
-          this.rotateBanner.apply(this)
+          this.rotateBanner.apply(this),
+          null
         );
 
     d.anx.length > 0?
     this.anim(d.cr, a[0],a[1]): false;
     d = {};
     a = [];
+  }
+
+  handleNextContentIn() {
+    let d = this.getParameters(),
+        i = this.nx.find('>*'),
+        a = this.getAnimParameters(
+          d.tr[2],
+          d.es,
+          d.at,
+          null,
+          null,
+          1
+        );
+    i.each((key,item) => {
+      this.anim(i, a[0],a[1]);
+    });
+    d = {};
+    i = {};
+    d = [];
   }
 
   rotateBanner() {

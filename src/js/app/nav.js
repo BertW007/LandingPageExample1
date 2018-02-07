@@ -3,6 +3,7 @@ export default class Nav {
     this.slideSpeed = 'slow';
     this.buttonId = '.toggle-nav';
     this.contentId = 'nav';
+    this.contentButtonId = '.nav-item';
     this.wrapperId = '.header-nav-wrapper';
     this.buttonStateId = 'aria-pressed';
     this.contentStateId = 'aria-expanded';
@@ -16,47 +17,55 @@ export default class Nav {
     this.wrapperChangePosition = 50;
   }
 
-  getButtonState() {
-    return this.button.attr(this.buttonStateId) === 'false'? false: true;
+  setState(element, stateId, state) {
+    element.attr(stateId, state);
   }
 
-  setButtonState(state) {
-    this.button? this.button.attr(this.buttonStateId, state): false;
+  getState(element, stateId) {
+    return element.attr(stateId) === 'false'? false: true;
   }
 
-  getContentState() {
-    return this.content.attr(this.contentStateId) === 'false'? false: true;
-  }
-
-  setContentState(state) {
-    this.content? this.content.attr(this.contentStateId, state): false;
-  }
-
-  toggleButtonClass() {
-    this.button.hasClass(this.buttonStateVariants[1])?
+  toggleButtonClass(button) {
+    button.hasClass(this.buttonStateVariants[1])?
       (
-        this.button.removeClass(this.buttonStateVariants[1]),
-        this.button.addClass(this.buttonStateVariants[0])
+        button.removeClass(this.buttonStateVariants[1]),
+        button.addClass(this.buttonStateVariants[0])
       ):
       (
-        this.button.addClass(this.buttonStateVariants[1]),
-        this.button.removeClass(this.buttonStateVariants[0])
+        button.addClass(this.buttonStateVariants[1]),
+        button.removeClass(this.buttonStateVariants[0])
       );
   }
 
-  toggleButton() {
-    this.getButtonState()? this.setButtonState(false): this.setButtonState(true);
-    this.toggleButtonClass();
+  toggleButton(button) {
+    this.getState(button, this.buttonStateId)?
+    this.setState(button, this.buttonStateId, false):
+    this.setState(button, this.buttonStateId, true);
   }
 
   toggleContent() {
-    this.getContentState()? this.setContentState(false): this.setContentState(true);
+    this.getState(this.content, this.contentStateId)?
+    this.setState(this.content, this.contentStateId, false):
+    this.setState(this.content, this.contentStateId, true);
     this.content.slideToggle(this.slideSpeed);
   }
 
   handleButtonClick() {
-    this.toggleButton();
+    this.toggleButton(this.button);
+    this.toggleButtonClass(this.button);
     this.toggleContent();
+  }
+
+  handleNavButtonsClick(e) {
+    const button = $(e.currentTarget),
+          target = $('#' + e.currentTarget.innerText.trim().toLowerCase());
+    this.setAllNavButtonPressedState(false);
+    this.toggleButton(button);
+    this.anim(target, 'scroll', {duration: 2000, offset: -50, easing: 'easeInOutCubic'});
+  }
+
+  setAllNavButtonPressedState(state) {
+    this.setState(this.navButtons, this.buttonStateId, state);
   }
 
   getScrollPosition() {
@@ -65,7 +74,7 @@ export default class Nav {
 
   toggleWrapper() {
     this.getScrollPosition() > this.wrapperChangePosition?
-    this.wrapper.hasClass(this.wrapperStateVariants[0])?
+      this.wrapper.hasClass(this.wrapperStateVariants[0])?
       false: this.wrapper.addClass(this.wrapperStateVariants[0]):
     this.wrapper.removeClass(this.wrapperStateVariants[0]);
   }
@@ -74,7 +83,9 @@ export default class Nav {
     this.content = this.find(this.contentId);
     this.button = this.find(this.buttonId);
     this.wrapper = this.find(this.wrapperId);
+    this.navButtons = this.find(this.contentButtonId);
     this.registerDomEvent(window, 'scroll', this.toggleWrapper.bind(this));
     this.registerDomEvent(this.buttonId, 'click', this.handleButtonClick.bind(this));
+    this.registerDomEvent(this.contentButtonId, 'click', this.handleNavButtonsClick.bind(this));
   };
 }

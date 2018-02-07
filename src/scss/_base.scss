@@ -142,7 +142,7 @@ form {
   margin: 0 auto;
 }
 
-#markets, #story, #about {
+#markets, #story, #news {
   padding-top: 60px;
   padding-bottom: 60px;
   text-align: center;
@@ -155,7 +155,7 @@ form {
   width: 75%;
 }
 
-#about {
+#news {
   padding: 0;
   background-color: rgba(0,0,0,.1);
   &>h2 {
@@ -211,9 +211,12 @@ form {
     }
     &> * {
       width: 40%;
-      margin: 0 auto;
       margin-top: 20px;
+      display: flex;
+      justify-content: center;
       text-align: center;
+      opacity: 0;
+      transition: opacity 1s;
     }
     button {
       width: 200px;
@@ -222,7 +225,11 @@ form {
 
   .current {
     display: flex;
+      &> * {
+      opacity: 1;
+    }
   }
+
   .velocity-animating {
     display: flex;
   }

@@ -76,6 +76,9 @@ export default class App {
       options,
       parameters
     )
+    element = {};
+    options = {};
+    parameters = {};
   }
   init() {
     const eventData = {app: this.dom, loader: $('#loader')};
