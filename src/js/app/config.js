@@ -3,6 +3,7 @@ import GoogleMap from './map';
 import Nav from './nav';
 import Outlines from './outlines';
 import Features from './features';
+import Clients from './clients';
 
 const configCreate = () => {
   const config = {
@@ -15,6 +16,7 @@ const configCreate = () => {
         Nav,
         Outlines,
         Features,
+        Clients,
         GoogleMap,
       ],
       RULES: {

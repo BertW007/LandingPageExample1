@@ -1,11 +1,17 @@
 export default class Banner {
   constructor() {
+    this.modulePrefix = '.';
+    this.moduleSuffix = '-';
     this.direction = 0;
     this.delay = 5000;
     this.currentId = 'current';
-    this.bannersId = '.banner-content';
-    this.leftButtonId = '.banner-controls-left';
-    this.rightButtonId = '.banner-controls-right';
+  }
+
+  setModuleId(id) {
+    this.moduleId = this.modulePrefix + id + this.moduleSuffix;
+    this.bannersId = this.moduleId + 'content';
+    this.leftButtonId = this.moduleId + 'controls-left';
+    this.rightButtonId = this.moduleId + 'controls-right';
   }
 
   getDirection() {
@@ -80,7 +86,7 @@ export default class Banner {
       cr: this.getCurrent(),
     }
 
-    d.bt.hasClass('banner-controls-left') ?
+    d.bt.hasClass(this.leftButtonId.split('.').join("")) ?
     this.setDirection(1):
     this.setDirection(0);
     this.isAnimating(d.cr) ||
@@ -168,6 +174,7 @@ export default class Banner {
 
 
   init() {
+    this.setModuleId('banner');
     this.banners = this.find(this.bannersId);
     this.registerDomEvent(this.leftButtonId, 'click', this.handleClick.bind(this));
     this.registerDomEvent(this.rightButtonId, 'click', this.handleClick.bind(this));

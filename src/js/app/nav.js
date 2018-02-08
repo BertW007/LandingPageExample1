@@ -61,7 +61,10 @@ export default class Nav {
           target = $('#' + e.currentTarget.innerText.trim().toLowerCase());
     this.setAllNavButtonPressedState(false);
     this.toggleButton(button);
-    this.anim(target, 'scroll', {duration: 2000, offset: -50, easing: 'easeInOutCubic'});
+    this.anim(target, 'scroll', {duration: 2000, offset: -60, easing: 'easeInOutCubic'});
+    this.toggleContent();
+    this.toggleButton(this.button);
+    this.toggleButtonClass(this.button);
   }
 
   setAllNavButtonPressedState(state) {

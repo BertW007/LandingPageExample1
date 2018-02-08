@@ -171,7 +171,7 @@ form {
 
 
 // MAIN BANNER
-.banner {
+.banner, .clients {
   display: flex;
   position: relative;
   flex-direction: column;
@@ -234,7 +234,7 @@ form {
     display: flex;
   }
 
-  .banner-controls-left,.banner-controls-right {
+  .banner-controls-left,.banner-controls-right, .clients-controls-left, .clients-controls-right {
     width: 40px;
     height: 40px;
     position: absolute;
@@ -619,6 +619,35 @@ nav li:last-child .nav-item {
     }
   }
 }
+
+.clients {
+  height: auto;
+  h2 {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    margin-top: 30px;
+  }
+  .clients-content {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 40px;
+    opacity: 0;
+  }
+  .clients-controls-left {
+    background-image: url($clients-prev-button);
+    left: 5%;
+  }
+  .clients-controls-right {
+    background-image: url($clients-next-button);
+    right: 5%;
+  }
+  .current {
+    display: flex;
+  }
+}
+
 .sponsors {
   height: 100px;
   width: 100%;
@@ -776,6 +805,7 @@ nav li:last-child .nav-item {
       }
     }
   }
+
   .copyrights {
     justify-content: space-around;
   }

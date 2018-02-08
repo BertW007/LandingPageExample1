@@ -4,9 +4,11 @@
   * JQuery,
       - velocity-animate,
   * Google Maps,
+  * ScrollReveal,
   * CSS/Sass,
       - autoprefixer
       - extract-text-webpack-plugin
+    *positioning: Flexbox(no floats)*
   * ES6,
       - babel-preset-env,
       - babel-core,
