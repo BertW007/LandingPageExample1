@@ -81,7 +81,6 @@ export default class Banner {
     this.getCurrent().length !== 1?
     false:
     this.handleCurrentOut();
-    d = {};
   }
 
   handleComplete() {

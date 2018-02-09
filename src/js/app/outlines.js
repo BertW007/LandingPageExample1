@@ -1,9 +1,14 @@
 export default class Outlines {
   constructor() {
-    this.buttonsId = 'button';
-    this.linksId = 'a';
     this.stateId = 'outline';
   }
+
+  setElements() {
+    this.elements = Array.from(arguments).map((arg) => {
+      return this.find(arg);
+    })
+  }
+
   handleClick() {
     this.hasOutlines()? this.removeOutlines(): false;
   }
@@ -13,22 +18,26 @@ export default class Outlines {
   }
 
   addOutlines() {
-    this.buttons.addClass(this.stateId);
-    this.links.addClass(this.stateId);
+    this.elements.forEach((element) => {
+      element.addClass(this.stateId)
+    })
   }
 
   removeOutlines() {
-    this.buttons.removeClass(this.stateId);
-    this.links.removeClass(this.stateId);
+    this.elements.forEach((element) => {
+      element.removeClass(this.stateId)
+    })
   }
 
   hasOutlines() {
-    return this.buttons.hasClass(this.stateId) && this.links.hasClass(this.stateId);
+    let e = this.elements.filter((element) => {
+      return element.hasClass(this.stateId)? element: false;
+    });
+    return e.length > 0? true: false;
   }
 
   init() {
-    this.buttons = this.find(this.buttonsId);
-    this.links = this.find(this.linksId);
+    this.setElements('button', 'a', 'input', 'textarea');
     this.registerDomEvent(window, 'keydown', this.handleKeyPressed.bind(this));
     this.registerDomEvent(window, 'click', this.handleClick.bind(this));
   }
