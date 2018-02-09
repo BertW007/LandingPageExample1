@@ -5,7 +5,8 @@
       - velocity-animate,
   * Google Maps,
   * ScrollReveal,
-  * CSS *[ positioning: Flexbox(no floats) ]* /Sass,
+  * CSS *[ positioning: Flexbox(no floats) ]*
+  * Sass,
       - autoprefixer
       - extract-text-webpack-plugin
   * ES6,

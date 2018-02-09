@@ -43,10 +43,14 @@ export default class Nav {
     this.setState(button, this.buttonStateId, true);
   }
 
-  toggleContent() {
+  toggleContent(bp) {
     this.getState(this.content, this.contentStateId)?
     this.setState(this.content, this.contentStateId, false):
     this.setState(this.content, this.contentStateId, true);
+    bp?
+    (
+      $(window).width() < bp? this.content.slideToggle(this.slideSpeed): false
+    ):
     this.content.slideToggle(this.slideSpeed);
   }
 
@@ -62,9 +66,12 @@ export default class Nav {
     this.setAllNavButtonPressedState(false);
     this.toggleButton(button);
     this.anim(target, 'scroll', {duration: 2000, offset: -60, easing: 'easeInOutCubic'});
-    this.toggleContent();
-    this.toggleButton(this.button);
-    this.toggleButtonClass(this.button);
+    this.toggleContent(768);
+    $(window).width() < 768?
+    (
+      this.toggleButton(this.button),
+      this.toggleButtonClass(this.button)
+    ): false;
   }
 
   setAllNavButtonPressedState(state) {
