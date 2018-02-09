@@ -5,6 +5,19 @@ export default class Banner {
     this.direction = 0;
     this.delay = 5000;
     this.currentId = 'current';
+    this.animPatternVariants = [
+      [
+        {translateX: '-100%'},
+        {translateX: ['0%','100%']}
+      ],
+      [
+        {translateX: ['100%','0%']},
+        {translateX: '0%'}
+      ],
+      [
+        {opacity: [1,0], translateY: ['0px', '-50px']}
+      ]
+    ]
   }
 
   setModuleId(id) {
@@ -48,134 +61,85 @@ export default class Banner {
     return n;
   }
 
-  getParameters() {
-    return {
-      anx: this.getAbsNext(),
-      nx: this.getNext(),
-      pr: this.getPrev(),
-      cr: this.getCurrent(),
-      dr: this.getDirection(),
-      es: 'easeOutCubic',
-      at: 1000,
-      tr: [
-        [['-100%'],['0%','100%']],
-        [['100%','0%'],['0%']],
-        ['0px', '-50px']
-      ]
-    }
-  }
 
-  getAnimParameters(tr, es, dr, bg, cp, tt) {
-    const trs = tt? {translateY: tr}: {translateX: tr};
-    return [
-      trs,
-      {
-        easing: es,
-        duration: dr,
-        begin: bg,
-        complete: cp,
-      }
-    ];
+  getAnimParameters(bg, cp, dl) {
+    return {
+      easing: 'easeOutCubic',
+      duration: 1000,
+      begin: bg,
+      complete: cp,
+      delay: dl || null,
+    }
   }
 
   handleClick(e) {
-
-    let d = {
-      bt: $(e.target),
-      nx: this.getNext(),
-      cr: this.getCurrent(),
-    }
-
-    d.bt.hasClass(this.leftButtonId.split('.').join("")) ?
+    $(e.target).hasClass(this.leftButtonId.split('.').join("")) ?
     this.setDirection(1):
     this.setDirection(0);
-    this.isAnimating(d.cr) ||
-    this.isAnimating(d.nx) ||
-    d.cr.length !== 1?
+    this.isAnimating(this.getCurrent()) ||
+    this.isAnimating(this.getNext()) ||
+    this.getCurrent().length !== 1?
     false:
     this.handleCurrentOut();
     d = {};
   }
 
-  handleNextContentIn() {
-    let d = this.getParameters(),
-        i = this.anx.find('>*'),
-        a = this.getAnimParameters(
-          d.tr[2],
-          d.es,
-          d.at,
-          null,
-          null,
-          1
-        );
-    this.anim(i, a[0],a[1]);
-
-    d = {};
-    i = {};
-    d = [];
-  }
-
   handleComplete() {
-    this.cr = this.getCurrent();
-    this.anx = this.getAbsNext();
-    const remove = () => {
-      this.cr.removeClass(this.currentId);
+      this.anim(
+        this.anx.find('>*'),
+        this.animPatternVariants[2][0],
+        this.getAnimParameters(null, null, 500)
+      );
       this.anx.addClass(this.currentId);
-      this.handleNextContentIn();
+      this.cr.removeClass(this.currentId);
+      this.cr.find('>*').css('opacity',0);
       delete this.cr;
       delete this.anx;
-    }
-    return remove;
   }
 
   handleNextIn() {
-      let d = this.getParameters(),
-          a = this.getAnimParameters(
-            d.tr[d.dr][1],
-            d.es,
-            d.at,
-            null,
-            this.handleComplete(),
-            null
-          );
-      this.anim(d.anx, a[0],a[1]);
-      d = {};
-      a = [];
+      this.anim(
+        this.anx,
+        this.animPatternVariants[this.getDirection()][1],
+        this.getAnimParameters(null, this.handleComplete.apply(this))
+      );
   }
 
   handleCurrentOut() {
-    let d = this.getParameters(),
-        a = this.getAnimParameters(
-          d.tr[d.dr][0],
-          d.es,
-          d.at,
-          this.handleNextIn.apply(this),
-          this.rotateBanner.apply(this),
-          null
-        );
+    this.anx = this.getAbsNext();
+    this.cr = this.getCurrent();
 
-    d.anx.length > 0?
-    this.anim(d.cr, a[0],a[1]): false;
-    d = {};
-    a = [];
+    this.anx.length > 0?
+    this.anim(
+      this.cr,
+      this.animPatternVariants[this.getDirection()][0], this.getAnimParameters(
+        this.handleNextIn.apply(this), this.rotateBanner.apply(this)
+      )
+    ):false;
+  }
+
+  toggleDirection() {
+    this.getNext() && !this.getPrev() ? this.setDirection(0):false;
+    this.getPrev() && !this.getNext() ? this.setDirection(1):false;
   }
 
   rotateBanner() {
     const nextRotation = () => {
-      let d = this.getParameters();
-      d.nx && !d.pr ? this.setDirection(0):false;
-      d.pr && !d.nx ? this.setDirection(1):false;
+      this.toggleDirection()
       this.handleCurrentOut();
-      d = {};
     }
     clearTimeout(this.id);
     this.id = setTimeout(nextRotation, this.delay);
   }
 
+  initCurrent() {
+    this.getCurrent().find('>*').css('opacity',1);
+  }
 
   init() {
     this.setModuleId('banner');
     this.banners = this.find(this.bannersId);
+    this.initCurrent();
     this.registerDomEvent(this.leftButtonId, 'click', this.handleClick.bind(this));
     this.registerDomEvent(this.rightButtonId, 'click', this.handleClick.bind(this));
     this.rotateBanner();
