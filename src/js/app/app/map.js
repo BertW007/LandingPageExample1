@@ -1,5 +1,5 @@
-import marker_icon from '../../img/loc.svg';
-import style from './mapstyle';
+import marker_icon from '../../../img/loc.svg';
+import style from './map/mapstyle';
 import GoogleMapsLoader from 'google-maps';
 
 export default class GoogleMap {
@@ -93,7 +93,7 @@ export default class GoogleMap {
         this.maps.event.clearInstanceListeners(this.map, marker);
       }
       this.maps.event.addListener(marker, 'click', this.handleMarkerClick);
-      this.emit('RWU', removeMarkerEvent);
+      this.onWindowUnload(removeMarkerEvent);
       return marker;
     });
   }

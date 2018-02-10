@@ -1,9 +1,10 @@
-import Banner from './banner';
-import GoogleMap from './map';
-import Nav from './nav';
-import Outlines from './outlines';
-import Features from './features';
-import Clients from './clients';
+import Banner from './app/banner';
+import GoogleMap from './app/map';
+import Nav from './app/nav';
+import Outlines from './app/outlines';
+import Features from './app/features';
+import Clients from './app/clients';
+import Email from './app/email';
 
 const configCreate = () => {
   const config = {
@@ -17,6 +18,7 @@ const configCreate = () => {
         Outlines,
         Features,
         Clients,
+        Email,
         GoogleMap,
       ],
       RULES: {

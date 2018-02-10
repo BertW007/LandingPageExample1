@@ -1,67 +1,90 @@
+import velocity from 'velocity-animate';
 import configCreate from './app/config';
 import logsCreate from './app/logs';
 import App from './app/app';
 import '../scss/main.scss';
 
 const appCreate = (app, config, logs) => {
-  const namespace = {};
-  namespace.registeredDomEvents = [];
-  namespace.config = typeof config === 'function'? config(): config;
-  namespace.throwError = (msg) => {throw new Error(msg)};
+
+  const namespace = {}, // Create namespace
+        throwError = (msg) => {
+          throw new Error(msg);
+        },
+        registerEvent = (element, type, fn) => { // register namespace event
+          let target = RULES._isString(element)? this.find(element): $(element);
+          target.on(type, fn);
+          // remove registered event on window unload
+          const removeEvent = () => {
+            target.off(type, fn);
+            window.removeEventListener('unload', removeEvent);
+            target = null;
+          }
+          window.addEventListener('unload', removeEvent);
+        },
+        onWindowUnload = (fn) => { // register callback executed on window unload
+          const remove = () => {
+            RULES._isFunction(fn)? fn(): false;
+            window.removeEventListener('unload', remove);
+          }
+          window.addEventListener('unload', remove);
+        },
+        find = (element) => {
+          return $('#' + NAME).find(element);
+        };
+
+  let tmp = typeof config === 'function'? config(): config;
+  let {NAME, LOG, LANG, MODULES, RULES} = tmp.app;
+  const lgs = RULES._isFunction(logs)? logs(LOG): logs;
+  tmp = null;
+
+  app.prototype.log = lgs.log;
+  app.prototype.throwError = throwError;
+  app.prototype.registerEvent = registerEvent;
+  app.prototype.onWindowUnload = onWindowUnload;
+  app.prototype.find = find;
+
   try {
-    namespace.logs = logs &&
-    namespace.config.app.RULES._isFunction(logs) &&
-    namespace.config.app.LOG? logs(namespace.config.app.LOG):
-    namespace.throwError('Unable to set logs');
-    !namespace[ namespace.config.app.NAME ]? namespace[ namespace.config.app.NAME ] = new App(
-      namespace.config.app.NAME,
-      namespace.logs.log,
-      namespace.throwError,
-      namespace.config.app.MODULES,
-      namespace.config.app.LANG,
-      namespace.config.app.RULES
-    ): namespace.throwError('Namespace name should be unique');
+    !namespace[ NAME ]? namespace[ NAME ] = new app(
+      NAME,
+      MODULES,
+      LANG,
+      RULES
+    ):
+    throwError('Namespace name should be unique');
   }
   catch(e) {
-    namespace.logs.log(e);
+    lgs.log(e);
   }
 
-  namespace[ namespace.config.app.NAME ].stop = () => {
-    namespace.registeredDomEvents.forEach((removeEvent)=>{
-      removeEvent();
-    });
+  // Stop app
+  const stop = () => {
     delete namespace.registeredDomEvents;
-    delete namespace[ namespace.config.app.NAME ].modules;
-    delete namespace[ namespace.config.app.NAME ];
-    delete namespace.logs;
-    delete namespace.config;
+    delete namespace[ NAME ].modules;
+    delete namespace[ NAME ];
   }
-  namespace[ namespace.config.app.NAME ].start = () => {
+
+  // Start app (returned by appCreate);
+  const start = () => {
+    //App init
     const init = () => {
       try {
-        namespace.config.app.RULES._isFunction(namespace[ namespace.config.app.NAME ].init) &&
-        namespace.config.app.RULES._isObject(namespace[ namespace.config.app.NAME ])?
+        RULES._isFunction(namespace[ NAME ].init) &&
+        RULES._isObject(namespace[ NAME ])?
         (
-          namespace[ namespace.config.app.NAME ].init()
-        ):namespace.throwError('Unable to init app or app is not an object');
+          namespace[ NAME ].init()
+        ):
+        throwError('Unable to init app or app is not an object');
       }
       catch(e) {
-        namespace.logs.log(e);
+        lgs.log(e);
       }
-      namespace[ namespace.config.app.NAME ].events.on('RWU',(e) => {
-        namespace.registeredDomEvents.push(e);
-      })
     }
-    const remove = () => {
-      document.removeEventListener('DOMContentLoaded', init);
-      namespace[ namespace.config.app.NAME ].stop();
-      window.removeEventListener('unload', remove);
-    }
-    document.addEventListener('DOMContentLoaded', init);
-    window.addEventListener('unload', remove);
-  }
-  return namespace[ namespace.config.app.NAME ];
-}
 
-const app = appCreate(App, configCreate, logsCreate);
-app.start();
+    registerEvent(window, 'load', init);
+    onWindowUnload(stop);
+  }
+  return start;
+}
+// Create App
+const start = appCreate(App, configCreate, logsCreate);
+start();

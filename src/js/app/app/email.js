@@ -1,0 +1,16 @@
+export default class Email {
+
+  handleEmailAddress() {
+    const adr = this.content.text().trim().toLowerCase().replace('(at)', '@').replace(/\(dot\)/g, '.'),
+          contact = $('<span>');
+    contact.addClass('.contact-email');
+    contact.html(`<a href="mailto:${adr}?subject=${this.subject}">${adr}</a>`);
+    this.content.replaceWith(contact);
+  }
+
+  init() {
+    this.content = this.find('.contact-email');
+    this.subject = 'Contact with us';
+    this.handleEmailAddress();
+  }
+}

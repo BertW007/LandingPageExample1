@@ -12,7 +12,7 @@ import news_item_2 from '../../img/news_2.jpg';
 import news_item_3 from '../../img/news_3.jpg';
 import news_item_4 from '../../img/news_4.jpg';
 
-const loaderCreate = (query, log, events) => {
+const loaderCreate = (log, events) => {
   const images = [
     banner_1,
     banner_2,
@@ -30,7 +30,7 @@ const loaderCreate = (query, log, events) => {
     img.src = image;
     return new Promise((resolve,reject)=>{
       img.onload = () => {
-        query(img).remove();
+        $(img).remove();
         img = null;
         resolve(true);
       };
