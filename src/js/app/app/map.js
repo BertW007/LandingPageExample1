@@ -178,7 +178,6 @@ export default class GoogleMap {
       Promise.all(this.addresses).then((addresses) => {
         this.addresses = addresses;
         delete this.geocoder;
-        this.sub('ACL', this.createMap.bind(this));
       });
     });
   }
@@ -186,6 +185,6 @@ export default class GoogleMap {
   init() {
     this.mapLoad();
     this.registerDomEvent(window, 'resize', this.handleMapResize.bind(this));
+    this.sub('ACL', this.createMap.bind(this));
   }
-
 }

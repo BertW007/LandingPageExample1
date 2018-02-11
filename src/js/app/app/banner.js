@@ -1,7 +1,5 @@
 export default class Banner {
   constructor() {
-    this.modulePrefix = '.';
-    this.moduleSuffix = '-';
     this.direction = 0;
     this.delay = 5000;
     this.currentId = 'current';

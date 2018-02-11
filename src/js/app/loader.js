@@ -12,7 +12,7 @@ import news_item_2 from '../../img/news_2.jpg';
 import news_item_3 from '../../img/news_3.jpg';
 import news_item_4 from '../../img/news_4.jpg';
 
-const loaderCreate = (log, events) => {
+const loader = () => {
   const images = [
     banner_1,
     banner_2,
@@ -26,33 +26,21 @@ const loaderCreate = (log, events) => {
     news_item_2,
     news_item_3,
     news_item_4 ].map((image) => {
-    let img = new Image();
-    img.src = image;
-    return new Promise((resolve,reject)=>{
-      img.onload = () => {
-        $(img).remove();
-        img = null;
-        resolve(true);
-      };
-      img.onerror = (e) => {
-        log(e);
-        img = null;
-        reject(false);
-      };
-    });
+      let img = new Image();
+      img.src = image;
+      return new Promise((resolve,reject)=>{
+        img.onload = () => {
+          $(img).remove();
+          img = null;
+          resolve(true);
+        };
+        img.onerror = (e) => {
+          log(e);
+          img = null;
+          reject(false);
+        };
+      });
   });
-  const handleInOut = (e) => {
-    e.loader.velocity('stop');
-    e.loader.velocity('fadeOut',{duration: 1000, complete: () => {
-      e.app.velocity('stop');
-      e.app.velocity('fadeIn',{duration: 1000, complete: () => {
-        e = {};
-        events.emit('ACL',{ load:'map' });
-      }});
-    }});
-  }
-  events.on('DCL',handleInOut);
-
   return images;
 }
-export default loaderCreate;
+export default loader;

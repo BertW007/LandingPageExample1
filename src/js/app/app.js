@@ -1,31 +1,38 @@
 import $ from 'jquery';
 import velocity from 'velocity-animate';
 import Events from './events';
-import loaderCreate from './loader';
+import loader from './loader';
 
 export default class App {
-  constructor(id, modules, lang, config) {
-    this.rules = config;
-    this.events = new Events();
-    this.loadImages = loaderCreate(this.log, this.events);
-    this.dom = $('#'+id);
-    this.lang = lang.current? lang.current: lang.default;
-    this.modules = modules;
-    this.errors = {
-      moduleCreate: 'Module creation faild. Uninitialized module should be a function',
-      moduleInitObject: 'Module creation faild. New module should be an object',
-      moduleInitFunction: 'Unable to init module. Module init should be a function',
+  constructor(name) {
+    try {
+      !$ || !velocity || !Events || !loader ?
+      this.throwError('App creation faild. Unable to find one or more dependencies'):
+      false;
+    } catch(e) {
+      this.log(e);
     }
+    this.name = name;
+    this.events = new Events();
+    this.imagesLoaded = loader();
   }
 
   anim(element, options, parameters) {
-    element.velocity('stop').velocity(
-      options,
-      parameters
-    )
-    element = {};
-    options = {};
-    parameters = {};
+    const e = element,
+          o = options,
+          p = parameters;
+    e.velocity('stop').velocity(o, p);
+    const reverse = () => {
+      e.velocity('reverse').velocity('stop');
+    }
+    return reverse;
+  }
+
+  add(module) {
+    module.prototype.emit = this.events.emit.bind(this.events);
+    module.prototype.sub = this.events.on.bind(this.events);
+    module.prototype.anim = this.anim;
+    return module;
   }
 
   createModules() {
@@ -33,22 +40,17 @@ export default class App {
       try {
         let newModule;
         this.rules._isFunction(module)?
-          newModule = new module():
-          this.throwError(this.errors.moduleCreate);
-        this.rules._isObject(newModule)?
+          (
+            newModule = this.add(this.create(module)),
+            newModule = new module()
+          ):
+          this.throwError('Module creation faild. Uninitialized module should be a function');
+        this.rules._isObject(newModule) && !this.rules._isArray(newModule)?
         (
-          newModule.lang = this.lang,
-          newModule.rules = this.rules,
-          newModule.emit = this.events.emit.bind(this.events),
-          newModule.sub = this.events.on.bind(this.events),
-          newModule.log = this.log,
-          newModule.find = this.find,
-          newModule.throwError = this.throwError,
-          newModule.registerDomEvent = this.registerEvent,
-          newModule.onWindowUnload = this.onWindowUnload,
-          newModule.anim = this.anim
+          newModule.modulePrefix = '.',
+          newModule.moduleSuffix = '-'
         ):
-        this.throwError(this.errors.moduleInitObject);
+        this.throwError('Module creation faild. New module should be an object');
         return newModule;
       } catch(e) {
         this.log(e);
@@ -62,7 +64,7 @@ export default class App {
         module.init &&
         this.rules._isFunction(module.init)?
         module.init():
-        this.throwError(this.errors.moduleInitFunction)
+        this.throwError('Unable to init module. Module init should be a function')
       })
     }
     catch(e) {
@@ -70,13 +72,46 @@ export default class App {
     }
   }
 
+  loaderRemove() {
+    this.loader.remove();
+    delete this.loader;
+  }
+
+  animIn() {
+    const complete = () => {
+      this.events.emit('ACL', null);
+    }
+
+    const animOut = () => {
+      this.anim(this.loader,
+        'fadeOut',
+        {
+          duration: 1000,
+          complete: complete
+        }
+      );
+    }
+
+    this.anim(
+      this.content,
+      'fadeIn',
+      {
+        duration: 1000,
+        begin: animOut
+      }
+    );
+  }
+
   init() {
-    const eventData = {app: this.dom, loader: $('#loader')};
     this.createModules();
-    Promise.all(this.loadImages).then(() => {
-        this.initModules();
-        delete this.loadImages;
-        this.events.emit('DCL', eventData);
+    this.initModules();
+    this.content = $('#'+ this.name);
+    this.loader = $('#loader');
+    Promise.all(this.imagesLoaded).then(() => {
+        this.animIn();
+        this.loaderRemove();
+        delete this.imagesLoaded;
+        delete this.content;
     })
   };
 }

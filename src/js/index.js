@@ -37,19 +37,30 @@ const appCreate = (app, config, logs) => {
   const lgs = RULES._isFunction(logs)? logs(LOG): logs;
   tmp = null;
 
+  app.prototype.create = (module) => {
+    let {_isFunction, _isObject, _isString, _isNumber, _isArray} = RULES;
+    module.prototype.lang = LANG.current? LANG.current: LANG.default;
+    module.prototype.find = find;
+    module.prototype.registerDomEvent = registerEvent;
+    module.prototype.onWindowUnload = onWindowUnload;
+    module.prototype.log = lgs.log;
+    module.prototype.throwError = throwError;
+    module.prototype.isFunction = _isFunction;
+    module.prototype.isObject = _isObject;
+    module.prototype.isString = _isString;
+    module.prototype.isNumber = _isNumber;
+    module.prototype.isArray = _isArray;
+    return module;
+  }
+
   app.prototype.log = lgs.log;
   app.prototype.throwError = throwError;
-  app.prototype.registerEvent = registerEvent;
-  app.prototype.onWindowUnload = onWindowUnload;
-  app.prototype.find = find;
+  app.prototype.rules = RULES;
+  app.prototype.modules = MODULES;
 
   try {
-    !namespace[ NAME ]? namespace[ NAME ] = new app(
-      NAME,
-      MODULES,
-      LANG,
-      RULES
-    ):
+    !namespace[ NAME ]?
+     namespace[ NAME ] = new app(NAME):
     throwError('Namespace name should be unique');
   }
   catch(e) {
@@ -58,8 +69,6 @@ const appCreate = (app, config, logs) => {
 
   // Stop app
   const stop = () => {
-    delete namespace.registeredDomEvents;
-    delete namespace[ NAME ].modules;
     delete namespace[ NAME ];
   }
 
@@ -70,9 +79,7 @@ const appCreate = (app, config, logs) => {
       try {
         RULES._isFunction(namespace[ NAME ].init) &&
         RULES._isObject(namespace[ NAME ])?
-        (
-          namespace[ NAME ].init()
-        ):
+        namespace[ NAME ].init():
         throwError('Unable to init app or app is not an object');
       }
       catch(e) {
