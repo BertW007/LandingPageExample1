@@ -55,7 +55,7 @@ const appCreate = (app, config, logs) => {
 
   app.prototype.log = lgs.log;
   app.prototype.throwError = throwError;
-  app.prototype.rules = RULES;
+  app.prototype.isFunction = RULES._isFunction;
   app.prototype.modules = MODULES;
 
   try {

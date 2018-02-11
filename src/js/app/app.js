@@ -8,50 +8,36 @@ export default class App {
     try {
       !$ || !velocity || !Events || !loader ?
       this.throwError('App creation faild. Unable to find one or more dependencies'):
-      false;
+      !name? this.throwError('App creation faild. App name not provided'):
+      this.name = name;
     } catch(e) {
       this.log(e);
     }
-    this.name = name;
     this.events = new Events();
     this.imagesLoaded = loader();
-  }
-
-  anim(element, options, parameters) {
-    const e = element,
-          o = options,
-          p = parameters;
-    e.velocity('stop').velocity(o, p);
-    const reverse = () => {
-      e.velocity('reverse').velocity('stop');
-    }
-    return reverse;
   }
 
   add(module) {
     module.prototype.emit = this.events.emit.bind(this.events);
     module.prototype.sub = this.events.on.bind(this.events);
-    module.prototype.anim = this.anim;
+    module.prototype.anim = (e, o, p) => {
+        e.velocity('stop').velocity(o, p);
+      };
     return module;
   }
 
   createModules() {
-    this.modules = this.modules.map((module) => {
+    this.modules = this.modules.map((m) => {
       try {
-        let newModule;
-        this.rules._isFunction(module)?
+        let module;
+        this.isFunction(m)?
           (
-            newModule = this.add(this.create(module)),
-            newModule = new module()
+            module = this.add(this.create(m)),
+            module.prototype.modulePrefix = '.',
+            module.prototype.moduleSuffix = '-'
           ):
           this.throwError('Module creation faild. Uninitialized module should be a function');
-        this.rules._isObject(newModule) && !this.rules._isArray(newModule)?
-        (
-          newModule.modulePrefix = '.',
-          newModule.moduleSuffix = '-'
-        ):
-        this.throwError('Module creation faild. New module should be an object');
-        return newModule;
+        return new module();
       } catch(e) {
         this.log(e);
       }
@@ -62,7 +48,7 @@ export default class App {
     try {
       this.modules.forEach((module) => {
         module.init &&
-        this.rules._isFunction(module.init)?
+        this.isFunction(module.init)?
         module.init():
         this.throwError('Unable to init module. Module init should be a function')
       })
@@ -72,18 +58,21 @@ export default class App {
     }
   }
 
-  loaderRemove() {
+  handleRemove() {
     this.loader.remove();
     delete this.loader;
+    delete this.imagesLoaded;
+    delete this.content;
   }
 
-  animIn() {
+  handleIn() {
+
     const complete = () => {
       this.events.emit('ACL', null);
     }
 
     const animOut = () => {
-      this.anim(this.loader,
+      this.loader.velocity('stop').velocity(
         'fadeOut',
         {
           duration: 1000,
@@ -91,9 +80,7 @@ export default class App {
         }
       );
     }
-
-    this.anim(
-      this.content,
+    this.content.velocity('stop').velocity(
       'fadeIn',
       {
         duration: 1000,
@@ -108,10 +95,8 @@ export default class App {
     this.content = $('#'+ this.name);
     this.loader = $('#loader');
     Promise.all(this.imagesLoaded).then(() => {
-        this.animIn();
-        this.loaderRemove();
-        delete this.imagesLoaded;
-        delete this.content;
+        this.handleIn();
+        this.handleRemove();
     })
   };
 }
