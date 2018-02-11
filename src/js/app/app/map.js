@@ -120,11 +120,14 @@ export default class GoogleMap {
 
   handleMarkerClick() {
     this.infowindow.opened?
-    this.infowindow.close(this.map, this):
+    (
+      this.infowindow.close(this.map, this),
+      this.infowindow.set('opened', false)
+    ):
     (
       this.infowindowsClose(),
       this.infowindow.open(this.map, this),
-      this.infowindow.opened = true
+      this.infowindow.set('opened', true)
     )
   }
 
