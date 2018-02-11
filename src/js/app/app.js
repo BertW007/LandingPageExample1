@@ -2,6 +2,7 @@ import $ from 'jquery';
 import velocity from 'velocity-animate';
 import Events from './events';
 import loader from './loader';
+import config from './config';
 
 export default class App {
   constructor(name) {
@@ -9,35 +10,35 @@ export default class App {
       !$ || !velocity || !Events || !loader ?
       this.throwError('App creation faild. Unable to find one or more dependencies'):
       !name? this.throwError('App creation faild. App name not provided'):
-      this.name = name;
+      this.query = $('#' + name);
     } catch(e) {
       this.log(e);
     }
-    this.events = new Events();
-    this.imagesLoaded = loader();
+    this.createModules();
   }
 
-  add(module) {
-    module.prototype.emit = this.events.emit.bind(this.events);
-    module.prototype.sub = this.events.on.bind(this.events);
-    module.prototype.anim = (e, o, p) => {
-        e.velocity('stop').velocity(o, p);
-      };
-    return module;
-  }
+  find(element) {
+    return this.query.find(element);
+  };
 
   createModules() {
-    this.modules = this.modules.map((m) => {
+    this.events = new Events();
+    this.imagesLoaded = loader();
+    this.modules = config.app.MODULES.map((creator) => {
       try {
         let module;
-        this.isFunction(m)?
-          (
-            module = this.add(this.create(m)),
-            module.prototype.modulePrefix = '.',
-            module.prototype.moduleSuffix = '-'
-          ):
-          this.throwError('Module creation faild. Uninitialized module should be a function');
-        return new module();
+        config.app.RULES._isFunction(creator)?
+        module = new creator():
+        this.throwError('Module creation faild. Uninitialized module should be a function');
+
+        module.modulePrefix = '.';
+        module.moduleSuffix = '-';
+        module.emit = this.events.emit.bind(this.events);
+        module.sub = this.events.on.bind(this.events);
+        module.find = this.find.bind(this);
+
+        return module;
+
       } catch(e) {
         this.log(e);
       }
@@ -48,7 +49,7 @@ export default class App {
     try {
       this.modules.forEach((module) => {
         module.init &&
-        this.isFunction(module.init)?
+        config.app.RULES._isFunction(module.init)?
         module.init():
         this.throwError('Unable to init module. Module init should be a function')
       })
@@ -62,7 +63,6 @@ export default class App {
     this.loader.remove();
     delete this.loader;
     delete this.imagesLoaded;
-    delete this.content;
   }
 
   handleIn() {
@@ -80,7 +80,7 @@ export default class App {
         }
       );
     }
-    this.content.velocity('stop').velocity(
+    this.query.velocity('stop').velocity(
       'fadeIn',
       {
         duration: 1000,
@@ -90,10 +90,8 @@ export default class App {
   }
 
   init() {
-    this.createModules();
-    this.initModules();
-    this.content = $('#'+ this.name);
     this.loader = $('#loader');
+    this.initModules();
     Promise.all(this.imagesLoaded).then(() => {
         this.handleIn();
         this.handleRemove();

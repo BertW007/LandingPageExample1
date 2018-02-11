@@ -1,5 +1,8 @@
-export default class Banner {
+import Module from '../module';
+
+export default class Banner extends Module {
   constructor() {
+    super();
     this.direction = 0;
     this.delay = 5000;
     this.currentId = 'current';

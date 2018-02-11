@@ -1,4 +1,6 @@
-export default class Email {
+import Module from '../module';
+
+export default class Email extends Module {
 
   handleEmailAddress() {
     const adr = this.content.text().trim().toLowerCase().replace('(at)', '@').replace(/\(dot\)/g, '.'),

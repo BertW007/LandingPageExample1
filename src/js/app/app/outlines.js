@@ -1,5 +1,8 @@
-export default class Outlines {
+import Module from '../module';
+
+export default class Outlines extends Module {
   constructor() {
+    super();
     this.stateId = 'outline';
   }
 

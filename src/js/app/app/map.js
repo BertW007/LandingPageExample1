@@ -1,9 +1,11 @@
 import marker_icon from '../../../img/loc.svg';
 import style from './map/mapstyle';
 import GoogleMapsLoader from 'google-maps';
+import Module from '../module';
 
-export default class GoogleMap {
+export default class GoogleMap extends Module {
   constructor() {
+    super();
     this.mapId = '#map';
     this.style = style;
     this.center = ['52.286983', '21.062947'];

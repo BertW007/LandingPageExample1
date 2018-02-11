@@ -1,5 +1,8 @@
-export default class Nav {
+import Module from '../module';
+
+export default class Nav extends Module {
   constructor() {
+    super();
     this.slideSpeed = 'slow';
     this.buttonId = '.toggle-nav';
     this.contentId = 'nav';
