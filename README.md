@@ -1,5 +1,5 @@
 # Fashion Theme
-
+![Screenshot](ftheme_view.png)
 ## Technologies:
   * JQuery,
       - velocity-animate,
