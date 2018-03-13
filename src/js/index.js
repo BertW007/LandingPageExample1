@@ -3,28 +3,28 @@ import logsCreate from './app/logs';
 import App from './app/app';
 import '../scss/main.scss';
 
-const appCreate = (app, config, logs) => {
+const logs = logsCreate(config.app.LOG);
 
-  const namespace = {},
-        throwError = (msg) => {
-          throw new Error(msg);
-        };
+const throwError = (msg) => {
+  throw new Error(msg);
+};
 
-  const lgs = config.app.RULES._isFunction(logs)? logs(config.app.LOG): logs;
+const appCreate = (app, config) => {
+
+  const namespace = {};
 
   try {
     !namespace[ config.app.NAME ] && config.app.RULES._isFunction(app)?
      (
-       namespace[ config.app. NAME ] = new app(config.app.NAME),
-       app.log = lgs.log,
-       app.getLog = lgs.get,
-       app.throwError = throwError,
-       app.lang = config.app.LANG.current? config.app.LANG.current: config.app.LANG.default
+       namespace[ config.app.NAME ] = new app(config.app.NAME),
+       namespace[ config.app.NAME ].logs = logs,
+       namespace[ config.app.NAME ].throwError = throwError,
+       namespace[ config.app.NAME ].lang = config.app.LANG.current? config.app.LANG.current: config.app.LANG.default
      ):
     throwError('Invalid app name or app is not a function');
   }
   catch(e) {
-    lgs.log(e);
+    logs.log(e);
   }
 
   // Stop app
@@ -42,7 +42,7 @@ const appCreate = (app, config, logs) => {
         throwError('Unable to init app');
       }
       catch(e) {
-        lgs.log(e);
+        logs.log(e);
       }
     }
 
@@ -58,5 +58,5 @@ const appCreate = (app, config, logs) => {
   return start;
 }
 // Create App
-const start = appCreate(App, config, logsCreate);
+const start = appCreate(App, config);
 start();

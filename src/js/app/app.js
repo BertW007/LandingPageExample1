@@ -12,7 +12,7 @@ export default class App {
       !name? this.throwError('App creation faild. App name not provided'):
       this.query = $('#' + name);
     } catch(e) {
-      this.log(e);
+      this.logs.log(e);
     }
     this.createModules();
   }
@@ -40,7 +40,7 @@ export default class App {
         return module;
 
       } catch(e) {
-        this.log(e);
+        this.logs.log(e);
       }
     });
   }
@@ -51,11 +51,11 @@ export default class App {
         module.init &&
         config.app.RULES._isFunction(module.init)?
         module.init():
-        this.throwError('Unable to init module. Module init should be a function')
+        this.throwError('Unable to initialize module. Module init should be a function')
       })
     }
     catch(e) {
-      this.log(e);
+      this.logs.log(e);
     }
   }
 

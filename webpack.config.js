@@ -46,14 +46,14 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/,
         use: {
           loader: 'url-loader',
-          options: {limit: 10000, outputPath: 'img/',publicPath:'../'},
+          options: {limit: 10000, outputPath: 'img/',publicPath:'../img'},
         }
       },
       {
         test: /\.(eot|ttf|woff|woff2)$/,
         use: {
           loader: 'url-loader',
-          options: {limit: 10000, outputPath: 'fonts/',publicPath:'../'},
+          options: {limit: 10000, outputPath: 'fonts/',publicPath:'../fonts'},
         }
       },
     ]

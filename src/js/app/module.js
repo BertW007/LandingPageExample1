@@ -11,7 +11,7 @@ export default class Module {
     target.on(type, fn);
 
     const removeEvent = () => {
-      target.off(type, fn);
+      target.off(type);
       window.removeEventListener('unload', removeEvent);
       target = null;
     }
