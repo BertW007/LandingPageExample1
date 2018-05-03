@@ -27,7 +27,7 @@ const loader = () => {
     news_item_3,
     news_item_4 ].map((image) => {
       let img = new Image();
-      img.src = image;
+      img.src = 'dist/' + image;
       return new Promise((resolve,reject)=>{
         img.onload = () => {
           $(img).remove();
