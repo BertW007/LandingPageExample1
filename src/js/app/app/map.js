@@ -1,25 +1,26 @@
-import marker_icon from '../../../img/loc.svg';
-import style from './map/mapstyle';
-import GoogleMapsLoader from 'google-maps';
-import Module from '../module';
+import markerIcon from '../../../img/loc.svg'
+import style from './map/mapstyle'
+import GoogleMapsLoader from 'google-maps'
+import Module from '../module'
+import $ from 'jquery'
 
 export default class GoogleMap extends Module {
-  constructor() {
-    super();
-    this.mapId = '#map';
-    this.style = style;
-    this.center = ['52.286983', '21.062947'];
+  constructor () {
+    super()
+    this.mapId = '#map'
+    this.style = style
+    this.center = ['52.286983', '21.062947']
     this.bounds = [
       ['37.739333', '49.175194'],
-      ['58.730505', '-13.269574'],
-    ];
+      ['58.730505', '-13.269574']
+    ]
     this.errors = {
       mapLoad: 'Unable to load google maps',
-      addressLoad: 'Unable to load one or more addresses',
+      addressLoad: 'Unable to load one or more addresses'
     }
     this.geocodeStatusVariants = [
       'OK',
-      'ZERO_RESULTS',
+      'ZERO_RESULTS'
     ]
     this.locations = [
       {
@@ -42,154 +43,147 @@ export default class GoogleMap extends Module {
         header: 'FashionTheme',
         phone: '+48 899 330 433',
         email: 'contact3@fasion.com'
-      },
-    ];
+      }
+    ]
     this.view = {
       zoom: 4,
       scrollwheel: false,
       disableDefaultUI: true,
-      styles: this.style,
+      styles: this.style
     }
   }
 
-  addressesLoad() {
+  addressesLoad () {
     this.addresses = this.locations.map((location) => {
-    return new Promise((resolve,reject) => {
-        this.geocoder.geocode( {location: new this.maps.LatLng(location.lat, location.lng)}, (results, status) => {
+      return new Promise((resolve, reject) => {
+        this.geocoder.geocode({location: new this.maps.LatLng(location.lat, location.lng)}, (results, status) => {
           if (status === this.geocodeStatusVariants[0]) {
-            resolve(results[0].formatted_address);
+            resolve(results[0].formatted_address)
           } else if (status === this.geocodeStatusVariants[1]) {
-            this.throwError(this.error.addressLoad),
-            reject('Address load faild');
+            reject(this.throwError(this.error.addressLoad))
           }
-        });
-      });
-    });
+        })
+      })
+    })
   }
 
-  createBounds() {
-    const b = new this.maps.LatLngBounds();
-    b.extend(new this.maps.LatLng(this.bounds[0][0],this.bounds[0][1]));
-    b.extend(new this.maps.LatLng(this.bounds[1][0],this.bounds[1][1]));
-    this.bounds = b;
+  createBounds () {
+    const b = new this.maps.LatLngBounds()
+    b.extend(new this.maps.LatLng(this.bounds[0][0], this.bounds[0][1]))
+    b.extend(new this.maps.LatLng(this.bounds[1][0], this.bounds[1][1]))
+    this.bounds = b
   }
 
-  createMarkers() {
-
-    this.markers = this.locations.map((location,key) => {
-      const marker =  new this.maps.Marker({
+  createMarkers () {
+    this.markers = this.locations.map((location, key) => {
+      const marker = new this.maps.Marker({
         position: new this.maps.LatLng(location.lat, location.lng),
         animation: this.maps.Animation.DROP,
         map: this.map,
-        icon: marker_icon,
+        icon: markerIcon,
         optimized: false,
         infowindow: this.infowindows[key],
         infowindowsClose: () => {
           this.infowindows.forEach((infowindow) => {
-            infowindow.close(this.map, this.markers[infowindow.markerId]);
-            infowindow.opened = false;
-          });
-        },
-      });
+            infowindow.close(this.map, this.markers[infowindow.markerId])
+            infowindow.opened = false
+          })
+        }
+      })
       const removeMarkerEvent = () => {
-        this.maps.event.clearInstanceListeners(this.map, marker);
+        this.maps.event.clearInstanceListeners(this.map, marker)
       }
-      this.maps.event.addListener(marker, 'click', this.handleMarkerClick);
-      this.onWindowUnload(removeMarkerEvent);
-      return marker;
-    });
+      this.maps.event.addListener(marker, 'click', this.handleMarkerClick)
+      this.onWindowUnload(removeMarkerEvent)
+      return marker
+    })
   }
 
-  createInfowindows() {
-    this.infowindows = this.locations.map((location,key) => {
-      const header = $('<h5>').text(location.header),
-            phone = $('<h6>').text(location.phone),
-            email = $('<h6>').text(location.email),
-            content = $('<div>'),
-            address = $('<p>').text(this.addresses[key]);
+  createInfowindows () {
+    this.infowindows = this.locations.map((location, key) => {
+      const header = $('<h5>').text(location.header)
+      const phone = $('<h6>').text(location.phone)
+      const email = $('<h6>').text(location.email)
+      const content = $('<div>')
+      const address = $('<p>').text(this.addresses[key])
 
-      content.append(header).append(phone).append(email).append(address);
-      $(this.mapId).append(content);
+      content.append(header).append(phone).append(email).append(address)
+      $(this.mapId).append(content)
 
       return new this.maps.InfoWindow({
         content: content[0],
-        pixelOffset: new this.maps.Size(0,17),
+        pixelOffset: new this.maps.Size(0, 17),
         opened: false,
         markerId: key
-      });
-    });
+      })
+    })
   }
 
-  handleMarkerClick() {
-    this.infowindow.opened?
-    (
-      this.infowindow.close(this.map, this),
-      this.infowindow.set('opened', false)
-    ):
-    (
-      this.infowindowsClose(),
-      this.infowindow.open(this.map, this),
+  handleMarkerClick () {
+    const open = () => {
+      this.infowindowsClose()
+      this.infowindow.open(this.map, this)
       this.infowindow.set('opened', true)
-    )
-  }
-
-  createMap() {
-    this.createBounds();
-    this.center = new this.maps.LatLng(this.center[0], this.center[1]);
-    this.map = new this.maps.Map($(this.mapId)[0], this.view);
-    this.map.setCenter(this.center);
-    this.map.fitBounds(this.bounds);
-    this.createInfowindows();
-    this.createMarkers();
-    delete this.view;
-    delete this.style;
-    delete this.locations;
-    delete this.addresses;
-  }
-
-  handleMapResize() {
-    this.map && this.maps?
-    (
-      this.map.fitBounds(this.bounds),
-      this.map.setCenter(this.center),
-      this.maps.event.trigger(this.map, 'resize')
-    ): false;
-  }
-
-  mapLoad() {
-    try {
-      this.maps = new Promise((resolve,reject) => {
-        GoogleMapsLoader.LANGUAGE = this.lang;
-        GoogleMapsLoader.load((google) => {
-          google?
-          resolve(google.maps):
-          (
-            this.throwError(this.error.mapLoad)
-          )
-        });
-      });
-    } catch(e) {
-      this.log(e);
     }
-    this.mapInit();
+    const close = () => {
+      this.infowindow.close(this.map, this)
+      this.infowindow.set('opened', false)
+    }
+    this.infowindow.opened ? close() : open()
   }
 
-  mapInit() {
+  createMap () {
+    this.createBounds()
+    this.center = new this.maps.LatLng(this.center[0], this.center[1])
+    this.map = new this.maps.Map($(this.mapId)[0], this.view)
+    this.map.setCenter(this.center)
+    this.map.fitBounds(this.bounds)
+    this.createInfowindows()
+    this.createMarkers()
+    delete this.view
+    delete this.style
+    delete this.locations
+    delete this.addresses
+  }
+
+  handleMapResize () {
+    if (this.map && this.maps) {
+      this.map.fitBounds(this.bounds)
+      this.map.setCenter(this.center)
+      this.maps.event.trigger(this.map, 'resize')
+    }
+  }
+
+  mapLoad () {
+    try {
+      this.maps = new Promise((resolve, reject) => {
+        GoogleMapsLoader.LANGUAGE = this.lang
+        GoogleMapsLoader.load((google) => {
+          google ? resolve(google.maps) : this.throwError(this.error.mapLoad)
+        })
+      })
+    } catch (e) {
+      this.log(e)
+    }
+    this.mapInit()
+  }
+
+  mapInit () {
     this.maps.then((maps) => {
-      this.maps = maps;
-      maps = {};
-      this.geocoder = new this.maps.Geocoder;
-      this.addressesLoad();
+      this.maps = maps
+      maps = {}
+      this.geocoder = new this.maps.Geocoder()
+      this.addressesLoad()
       Promise.all(this.addresses).then((addresses) => {
-        this.addresses = addresses;
-        delete this.geocoder;
-      });
-    });
+        this.addresses = addresses
+        delete this.geocoder
+      })
+    })
   }
 
-  init() {
-    this.mapLoad();
-    this.registerDomEvent(window, 'resize', this.handleMapResize.bind(this));
-    this.sub('ACL', this.createMap.bind(this));
+  init () {
+    this.mapLoad()
+    this.registerDomEvent(window, 'resize', this.handleMapResize.bind(this))
+    this.sub('ACL', this.createMap.bind(this))
   }
 }
